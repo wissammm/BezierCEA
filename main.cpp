@@ -3,6 +3,8 @@
 #include <cmath>
 #include <vector>
 #include <string>
+#include <ctime>
+using namespace std;
 
 struct Point
 {
@@ -57,38 +59,37 @@ int binomial(int n, int k)
     return binomial(n - 1, k - 1) + binomial(n - 1, k);
 }
 
-Point bezier(std::vector<Point> *tab, int nb_points, float t)
+double bernstein(int m, int i, double u)
 {
+    return binomial(m, i) * pow(u, i) * pow((1 - u), m - i);
+}
+
+Point computeBezier(const std::vector<Point> &tab, double t)
+{
+
     Point res;
-    res.x = 0.f;
-    res.y = 0.f;
-    //: COMMENT:Wissam: Optimisable si on utilise un itérateur et non un for
-    for (int i = 0; i < nb_points; i++)
+    for (int i = 0; i < tab.size(); i++)
     {
-        res.x += binomial(nb_points, i) * (pow((double)(1 - t), (double)(nb_points - i)) * pow((double)t, (double)i)) * tab->at(i).x;
-        res.y += binomial(nb_points, i) * (pow((double)(1 - t), (double)(nb_points - i)) * pow((double)t, (double)i)) * tab->at(i).y;
+        res.x += bernstein(tab.size() - 1, i, t) * tab[i].x;
+        res.y += bernstein(tab.size() - 1, i, t) * tab[i].y;
     }
     return res;
 }
 
-Point casteljau(const std::vector<Point> &tab, int nb_points, double t)
+void bezier(const std::vector<Point> &tab, std::vector<Point> &curve, const int nb_points_on_curve)
 {
-    //: SOURCE: https://fr.wikipedia.org/wiki/Algorithme_de_Casteljau
-    Point res;
-    res.x = 0.f;
-    res.y = 0.f;
-    std::vector<std::vector<Point>> tmp(nb_points);
-
-    tmp[0] = tab;
-
-    for (int i = 1; i < nb_points; i++)
+    for (int i = 0; i <= nb_points_on_curve; i++)
     {
-        tmp[i].resize(nb_points - i);
+        curve.push_back(computeBezier(tab, static_cast<double>(i) / static_cast<double>(nb_points_on_curve) * 1.));
     }
+}
 
-    for (int j = 1; j < nb_points; j++)
+Point computeCasteljau(std::vector<std::vector<Point>> &tmp, double t)
+{
+
+    for (int j = 1; j < tmp[0].size(); j++)
     {
-        for (int i = 0; i < nb_points - j; i++)
+        for (int i = 0; i < tmp[0].size() - j; i++)
         {
 
             Point T;
@@ -99,21 +100,64 @@ Point casteljau(const std::vector<Point> &tab, int nb_points, double t)
         }
     }
 
-    return tmp[nb_points - 1][0];
+    return tmp[tmp[0].size() - 1][0];
+}
+
+void casteljau(const std::vector<Point> &tab, std::vector<Point> &curve, const int nb_points_on_curve)
+{
+    //: SOURCE: https://fr.wikipedia.org/wiki/Algorithme_de_Casteljau
+
+    std::vector<std::vector<Point>> tmp(tab.size());
+    std::vector<Point> ret;
+
+    tmp[0] = tab;
+
+    for (int i = 1; i < tab.size(); i++)
+    {
+        tmp[i].resize(tab.size() - i);
+    }
+
+    for (int i = 0; i <= nb_points_on_curve; i++)
+    {
+        curve.push_back(computeCasteljau(tmp, static_cast<double>(i) / static_cast<double>(nb_points_on_curve) * 1.));
+    }
+}
+
+std::vector<Point> randomPoint(int n, int y, int x)
+{
+    auto random_points = std::vector<Point>{};
+    for (int i = 0; i < n; i++)
+    {
+
+        random_points.push_back(Point({static_cast<double>(rand() % x),
+                                       static_cast<double>(rand() % y)}));
+    }
+    return random_points;
 }
 
 int main(int, char **)
 {
     std::cout << "Hello, world!\n";
 
-    const auto points = std::vector<Point>{{0., 0.}, {1., 0.}, {2., 1.}, {4., 7.}};
-    auto curve = std::vector<Point>{};
+    const auto points = randomPoint(10, 50, 50);
+    auto curve_castel = std::vector<Point>{};
+    auto curve_bez = std::vector<Point>{};
     int nb_points_on_curve = 30;
-    for (int i = 1; i < nb_points_on_curve; i++)
-    {
-        curve.push_back(casteljau(points, points.size(), static_cast<double>(i) / static_cast<double>(nb_points_on_curve) * 1.));
-    }
 
-    writeLinesVTK(points,"lines.vtk");
-    writeLinesVTK(curve, "curve.vtk");
+    clock_t time_req;
+
+    time_req = clock();
+    casteljau(points, curve_castel, nb_points_on_curve);
+    time_req = clock() - time_req;
+    cout << "Casteljau algorithm with " << nb_points_on_curve << " points compute. Time : " << time_req << endl;
+
+    time_req = clock();
+    bezier(points,curve_bez,nb_points_on_curve);
+    time_req = clock() - time_req;
+    cout << "Bezier algorithm with " << nb_points_on_curve << " points compute. Time : " << time_req << endl
+         << endl;
+
+    writeLinesVTK(points, "result/lines.vtk");
+    writeLinesVTK(curve_castel, "result/curve_castel.vtk");
+    writeLinesVTK(curve_castel, "result/curve_bezier.vtk");
 }
