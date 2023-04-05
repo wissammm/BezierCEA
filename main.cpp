@@ -6,8 +6,8 @@
 
 struct Point
 {
-    float x;
-    float y;
+    double x;
+    double y;
 };
 
 void writePointsVTK(const std::vector<Point> &points, const std::string &filePath)
@@ -50,14 +50,6 @@ void writeLinesVTK(const std::vector<Point> &points, const std::string &filePath
     out << "\n";
 }
 
-int main(int, char **)
-{
-    std::cout << "Hello, world!\n";
-
-    const auto points = std::vector<Point>{{0., 0.}, {1., 0.}, {2., 1.}};
-    writeLinesVTK(points, "C:/Temp/lines.vtk");
-}
-
 int binomial(int n, int k)
 {
     if (k == 0 || k == n)
@@ -73,21 +65,23 @@ Point bezier(std::vector<Point> *tab, int nb_points, float t)
     //: COMMENT:Wissam: Optimisable si on utilise un itérateur et non un for
     for (int i = 0; i < nb_points; i++)
     {
-        res.x += binomial(nb_points, i) * (float)(pow((double)(1 - t), (double)(nb_points - i)) * pow((double)t, (double)i)) * tab->at(i).x;
-        res.y += binomial(nb_points, i) * (float)(pow((double)(1 - t), (double)(nb_points - i)) * pow((double)t, (double)i)) * tab->at(i).y;
+        res.x += binomial(nb_points, i) * (pow((double)(1 - t), (double)(nb_points - i)) * pow((double)t, (double)i)) * tab->at(i).x;
+        res.y += binomial(nb_points, i) * (pow((double)(1 - t), (double)(nb_points - i)) * pow((double)t, (double)i)) * tab->at(i).y;
     }
     return res;
 }
 
-Point casteljau(std::vector<Point> &tab, int nb_points, float t)
+Point casteljau(const std::vector<Point> &tab, int nb_points, double t)
 {
-    //:SOURCE: https://fr.wikipedia.org/wiki/Algorithme_de_Casteljau
+    //: SOURCE: https://fr.wikipedia.org/wiki/Algorithme_de_Casteljau
     Point res;
     res.x = 0.f;
     res.y = 0.f;
     std::vector<std::vector<Point>> tmp(nb_points);
 
-    for (int i = 0; i < nb_points; i++)
+    tmp[0] = tab;
+
+    for (int i = 1; i < nb_points; i++)
     {
         tmp[i].resize(nb_points - i);
     }
@@ -96,9 +90,30 @@ Point casteljau(std::vector<Point> &tab, int nb_points, float t)
     {
         for (int i = 0; i < nb_points - j; i++)
         {
-            Point act;
-            // act.x = t* 0;
+
+            Point T;
+            T.x = t * tmp[j - 1][i + 1].x + (1 - t) * tmp[j - 1][i].x;
+            T.y = t * tmp[j - 1][i + 1].y + (1 - t) * tmp[j - 1][i].y;
+
+            tmp[j][i] = T;
         }
     }
-    return {};
+
+    return tmp[nb_points - 1][0];
+}
+
+int main(int, char **)
+{
+    std::cout << "Hello, world!\n";
+
+    const auto points = std::vector<Point>{{0., 0.}, {1., 0.}, {2., 1.}, {4., 7.}};
+    auto curve = std::vector<Point>{};
+    int nb_points_on_curve = 30;
+    for (int i = 1; i < nb_points_on_curve; i++)
+    {
+        curve.push_back(casteljau(points, points.size(), static_cast<double>(i) / static_cast<double>(nb_points_on_curve) * 1.));
+    }
+
+    writeLinesVTK(points,"lines.vtk");
+    writeLinesVTK(curve, "curve.vtk");
 }
