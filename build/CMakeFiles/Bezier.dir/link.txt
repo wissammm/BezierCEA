@@ -1,1 +1,0 @@
-/usr/bin/c++ -g -rdynamic CMakeFiles/Bezier.dir/main.cpp.o -o Bezier 
