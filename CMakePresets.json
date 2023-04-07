@@ -1,0 +1,30 @@
+﻿{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "visual-x64",
+      "generator": "Visual Studio 17 2012",
+      "architecture": {
+        "value": "x64"
+      },
+      "binaryDir": "build"
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "Debug",
+      "configurePreset": "visual-x64",
+      "configuration": "Debug"
+    },
+    {
+      "name": "RelWithDebInfo",
+      "configurePreset": "visual-x64",
+      "configuration": "RelWithDebInfo"
+    },
+    {
+      "name": "Release",
+      "configurePreset": "visual-x64",
+      "configuration": "Release"
+    }
+  ]
+}
