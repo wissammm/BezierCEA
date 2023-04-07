@@ -3,7 +3,7 @@
   "configurePresets": [
     {
       "name": "visual-x64",
-      "generator": "Visual Studio 17 2012",
+      "generator": "Visual Studio 17 2022",
       "architecture": {
         "value": "x64"
       },
