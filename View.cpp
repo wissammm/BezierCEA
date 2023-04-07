@@ -29,14 +29,7 @@ int View::createWindow(int h, int w) {
 
     // Declare rect of square
     SDL_Rect squareRect;
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    // Square dimensions: Half of the min(SCREEN_WIDTH, SCREEN_HEIGHT)
-    squareRect.w = std::min(w, h) / 2;
-    squareRect.h = std::min(w, h) / 2;
-
-    // Square position: In the middle of the screen
-    squareRect.x = w / 2 - squareRect.w / 2;
-    squareRect.y = h / 2 - squareRect.h / 2;
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     // Event loop exit flag
     bool quit = false;
@@ -52,16 +45,10 @@ int View::createWindow(int h, int w) {
         }
 
         // Initialize renderer color white for the background
-        SDL_SetRenderDrawColor(renderer,0, 0, 0, 0);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 
         // Clear screen
         SDL_RenderClear(renderer);
-
-        // Set renderer color red to draw the square
-       SDL_SetRenderDrawColor(renderer,255, 0, 255, 0);
-
-        // Draw filled square
-        SDL_RenderFillRect(renderer, &squareRect);
 
         // Update screen
         SDL_RenderPresent(renderer);
@@ -69,4 +56,27 @@ int View::createWindow(int h, int w) {
     return 0;
 }
 
-void View::drawLine(Segment segment) { int a; }
+void View::drawLine(Segment segment) {
+
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 0);
+    SDL_RenderDrawLine(renderer, segment.a.x, segment.a.y, segment.b.x, segment.b.y);
+
+    // Update screen
+    SDL_RenderPresent(renderer);
+}
+
+void View::drawLines(Segments lines) {
+
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 0);
+    for (size_t i = 0; i < lines.size(); i++) {
+        drawLine(lines[i]);
+    }
+}
+
+void View::drawLines(std::vector<Coord> points) {
+
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 0);
+    for (size_t i = 0; i < points.size() - 1; i++) {
+        drawLine(Segment({points[i], points[i + 1]}));
+    }
+}

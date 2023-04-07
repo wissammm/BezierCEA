@@ -28,14 +28,14 @@
 //     std::chrono::steady_clock::time_point tStart;
 // };
 
-using Bezier   = std::vector<Coord>;
-using Buffer   = std::vector<std::vector<Coord>>;
-using Segments = std::vector<Segment>;
-
 // Point evaluate(const Bezier& curve, double t)
 // {
 
 // }
+
+
+using Buffer   = std::vector<std::vector<Coord>>;
+
 
 Bezier derivate(const Bezier& curve) {
 
@@ -257,14 +257,27 @@ int main(int, char**) {
     Bezier curve_bez;
     int    nb_points_on_curve = 20;
 
-    View view;
-    int  signal = view.createWindow(600, 800);
 
     {
         const auto [curv_normals, normals, tangents] = normalsAndTangents(points, nb_points_on_curve, 1.);
         writeSegmentsVTK(normals, "result/normals.vtk");
         writeLinesVTK(curv_normals, "result/curv_normals.vtk");
+
+        View view;
+        int  signal = view.createWindow(600, 800);
+        
+        //:TODO: Changer les boucles pour avoir une vrai fonction 
+        view.changeColor(10,55,255);
+        for(int i = 0 ; i < normals.size() ; ++i){
+            view.drawLine(normals[i]);
+        }
+
+        view.changeColor(125,255,255);
+        
+        view.drawLines(curv_normals);
+
     }
 
+    
     writeLinesVTK(points, "result/lines.vtk");
 }
