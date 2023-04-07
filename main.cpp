@@ -1,3 +1,4 @@
+#include "Coord.h"
 #include <chrono>
 #include <iostream>
 #include <fstream>
@@ -27,26 +28,14 @@ class Timer
     std::chrono::steady_clock::time_point tStart;
 };
 
-struct Point
-{
-    double x;
-    double y;
-};
-
 struct Segment
 {
-    Point a;
-    Point b;
+    Coord a;
+    Coord b;
 };
 
-Point subPoint(const Point p1, const Point p2) { return Point({p1.x - p2.x, p1.y - p2.y}); }
-
-Point subPoint(const Point p1, const Point p2, int factor) {
-    return Point({factor * (p1.x - p2.x), factor * (p1.y - p2.y)});
-}
-
-using Bezier   = std::vector<Point>;
-using Buffer   = std::vector<std::vector<Point>>;
+using Bezier   = std::vector<Coord>;
+using Buffer   = std::vector<std::vector<Coord>>;
 using Normals  = std::vector<Segment>;
 using Tangents = std::vector<Segment>;
 
@@ -69,25 +58,25 @@ Bezier derivate(const Bezier& curve) {
     Bezier retDeriv(curve.size() - 1);
 
     for (size_t i = 1; i < curve.size(); i++) {
-        retDeriv[i - 1] = subPoint(curve.at(i - 1), curve.at(i), curve.size() - 1);
+        retDeriv[i - 1] = (curve[i - 1] - curve[i]) * static_cast<double>(curve.size() - 1);
     }
     return retDeriv;
 }
 
-Point computeTangent(Point deriv_time_t) {
+Coord computeTangent(Coord deriv_time_t) {
     //: SOURCE: https://pomax.github.io/bezierinfo/#derivatives
     double m = sqrt(deriv_time_t.x * deriv_time_t.x + deriv_time_t.y * deriv_time_t.y);
-    return Point({deriv_time_t.x / m, deriv_time_t.y / m});
+    return Coord({deriv_time_t.x / m, deriv_time_t.y / m});
 }
 
-Point computeNormal(Point tengent) {
+Coord computeNormal(Coord tengent) {
     //: SOURCE: https://pomax.github.io/bezierinfo/#derivatives
     double m = sqrt(tengent.x * tengent.x + tengent.y * tengent.y);
 
-    return Point({-tengent.y / m, tengent.x / m});
+    return Coord({-tengent.y / m, tengent.x / m});
 }
 
-void writePointsVTK(const std::vector<Point>& points, const std::filesystem::path& filePath) {
+void writePointsVTK(const std::vector<Coord>& points, const std::filesystem::path& filePath) {
     std::ofstream out{filePath};
 
     out << "# vtk DataFile Version 2.0\n";
@@ -106,7 +95,7 @@ void writePointsVTK(const std::vector<Point>& points, const std::filesystem::pat
     out << '\n';
 }
 
-void writeLinesVTK(const std::vector<Point>& points, const std::filesystem::path& filePath) {
+void writeLinesVTK(const std::vector<Coord>& points, const std::filesystem::path& filePath) {
     std::ofstream out{filePath};
 
     out << "# vtk DataFile Version 2.0\n";
@@ -157,23 +146,23 @@ int binomial(int n, int k) {
 
 double bernstein(int m, int i, double u) { return binomial(m, i) * pow(u, i) * pow((1 - u), m - i); }
 
-Point computeBezier(const std::vector<Point>& tab, double t) {
+Coord computeBezier(const std::vector<Coord>& tab, double t) {
 
-    Point res{0., 0.};
+    Coord res{0., 0.};
     for (int i = 0; i < tab.size(); i++) {
-        res.x += bernstein(tab.size() - 1, i, t) * tab[i].x;
-        res.y += bernstein(tab.size() - 1, i, t) * tab[i].y;
+        res.x += bernstein(static_cast<int>(tab.size() - 1), i, t) * tab[i].x;
+        res.y += bernstein(static_cast<int>(tab.size() - 1), i, t) * tab[i].y;
     }
     return res;
 }
 
-void bezier(const std::vector<Point>& tab, std::vector<Point>& curve, const int nb_points_on_curve) {
+void bezier(const std::vector<Coord>& tab, std::vector<Coord>& curve, const int nb_points_on_curve) {
     for (int i = 0; i <= nb_points_on_curve; i++) {
         curve.push_back(computeBezier(tab, static_cast<double>(i) / static_cast<double>(nb_points_on_curve) * 1.));
     }
 }
 
-Point computeCasteljau(Buffer& tmp, double t) {
+Coord computeCasteljau(Buffer& tmp, double t) {
     const auto n = tmp[0].size();
     for (size_t j = 1; j < n; ++j) {
         for (size_t i = 0; i < n - j; ++i) {
@@ -199,7 +188,7 @@ Buffer createBuffer(const Bezier& tab) {
     return tmp;
 }
 
-void casteljau(const Bezier& tab, std::vector<Point>& curve, const int nb_points_on_curve) {
+void casteljau(const Bezier& tab, std::vector<Coord>& curve, const int nb_points_on_curve) {
     //: SOURCE: https://fr.wikipedia.org/wiki/Algorithme_de_Casteljau
 
     Buffer bufferCurve = createBuffer(tab);
@@ -211,7 +200,7 @@ void casteljau(const Bezier& tab, std::vector<Point>& curve, const int nb_points
 }
 
 void normalsAndTangents(const Bezier&       tab,
-                        std::vector<Point>& curve,
+                        std::vector<Coord>& curve,
                         const int           nb_points_on_curve,
                         Tangents&           tangents,
                         Normals&            normals,
@@ -224,21 +213,21 @@ void normalsAndTangents(const Bezier&       tab,
     for (int i = 0; i <= nb_points_on_curve; i++) {
         double time = static_cast<double>(i) / static_cast<double>(nb_points_on_curve) * 1.;
 
-        Point curvePoint = computeCasteljau(bufferCurve, time);
+        Coord curvePoint = computeCasteljau(bufferCurve, time);
 
         curve.push_back(curvePoint);
-        Point deriv_point = computeCasteljau(bufferDeriv, time);
-        Point tangent     = computeTangent(deriv_point);
-        Point normal      = computeNormal(tangent);
+        Coord deriv_point = computeCasteljau(bufferDeriv, time);
+        Coord tangent     = computeTangent(deriv_point);
+        Coord normal      = computeNormal(tangent);
 
-        tangents.push_back(Segment({subPoint(tangent, curvePoint, factor), curvePoint}));
-        normals.push_back(Segment({subPoint(normal, curvePoint, factor), curvePoint}));
+        tangents.push_back(Segment({(tangent - curvePoint) * factor, curvePoint}));
+        normals.push_back(Segment({(normal - curvePoint) * factor, curvePoint}));
     }
 }
 
 std::array<Bezier, 2> decompose(const Bezier& curve, double t) {
     // ... TODO
-    uint16_t curve_size = curve.size();
+    size_t curve_size = curve.size();
     Buffer   tmp(curve_size);
 
     tmp[0] = curve;
@@ -251,7 +240,7 @@ std::array<Bezier, 2> decompose(const Bezier& curve, double t) {
     //: SOURCE: https://www.youtube.com/watch?v=lPJo1jayLdc
     Bezier part1, part2(curve_size);
 
-    for (uint16_t i = 0; i < curve_size; ++i) {
+    for (size_t i = 0; i < curve_size; ++i) {
         part1.push_back(tmp[i][0]);
         part2[curve_size - i - 1] = (tmp[i][curve_size - i - 1]);
     }
@@ -263,7 +252,7 @@ Bezier randomPoint(int n, int y, int x) {
     Bezier random_points;
     for (int i = 0; i < n; i++) {
 
-        random_points.push_back(Point({static_cast<double>(rand() % x), static_cast<double>(rand() % y)}));
+        random_points.push_back(Coord({static_cast<double>(rand() % x), static_cast<double>(rand() % y)}));
     }
     return random_points;
 }
@@ -325,7 +314,7 @@ int main(int, char**) {
     // }
 
     {
-        auto     curv_normals = std::vector<Point>{};
+        auto     curv_normals = std::vector<Coord>{};
         Tangents tangents;
         Normals  normals;
         normalsAndTangents(points, curv_normals, nb_points_on_curve, tangents, normals, 0.2);

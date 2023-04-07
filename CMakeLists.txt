@@ -5,5 +5,5 @@ project(Bezier VERSION 0.1.0)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
-add_executable(Bezier main.cpp)
+add_executable(Bezier main.cpp Coord.h Coord.cpp)
 target_compile_definitions(Bezier PRIVATE "RESULT_DIR=\"${CMAKE_CURRENT_LIST_DIR}/result\"")
