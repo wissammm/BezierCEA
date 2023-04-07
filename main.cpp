@@ -76,12 +76,12 @@ Bezier derivate(const Bezier &curve)
 
     for (size_t i = 1; i < curve.size(); i++)
     {
-        retDeriv[i - 1] = subPoint(curve.at(i), curve.at(i - 1), curve.size() - 1);
+        retDeriv[i - 1] = subPoint(curve.at(i - 1),curve.at(i), curve.size() - 1);
     }
     return retDeriv;
 }
 
-Point computeTengent(Point deriv_time_t)
+Point computeTangent(Point deriv_time_t)
 {
     //: SOURCE: https://pomax.github.io/bezierinfo/#derivatives
     double m = sqrt(deriv_time_t.x * deriv_time_t.x +
@@ -255,8 +255,8 @@ void normalsAndTangents(const Bezier &tab, std::vector<Point> &curve, const int 
         Point curvePoint = computeCasteljau(bufferCurve, time);
 
         curve.push_back(curvePoint);
-        Point deriv = computeCasteljau(bufferDeriv, time);
-        Point tangent = computeTengent(deriv);
+        Point deriv_point = computeCasteljau(bufferDeriv, time);
+        Point tangent = computeTangent(deriv_point);
         Point normal = computeNormal(tangent);
 
         tangents.push_back(Segment({subPoint(tangent, curvePoint, factor), curvePoint}));
@@ -306,11 +306,11 @@ int main(int, char **)
 {
     std::cout << "Hello, world!\n";
 
-    const auto points = randomPoint(3, 50, 50);
+    const auto points = randomPoint(5, 50, 50);
 
     Bezier curve_castel;
     Bezier curve_bez;
-    int nb_points_on_curve = 3;
+    int nb_points_on_curve = 20;
 
     // {
     //     // auto timer = Timer{ "Casteljau algorithm with " + std::to_string(nb_points_on_curve) + " points compute. Time : " };
@@ -363,7 +363,7 @@ int main(int, char **)
         auto curv_normals = std::vector<Point>{};
         Tangents tangents;
         Normals normals;
-        normalsAndTangents(points,curv_normals,nb_points_on_curve,tangents,normals,1);
+        normalsAndTangents(points,curv_normals,nb_points_on_curve,tangents,normals,0.2);
         writeSemgentsVTK(normals,"result/normals.vtk");
         writeLinesVTK(curv_normals, "result/curv_normals.vtk");
     }
