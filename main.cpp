@@ -8,7 +8,6 @@
 #include <ctime>
 #include <array>
 #include <filesystem>
-using namespace std;
 
 std::filesystem::path getResultPath() { return std::filesystem::u8path(RESULT_DIR); }
 
@@ -20,7 +19,7 @@ class Timer
     ~Timer() {
         const auto tEnd     = std::chrono::high_resolution_clock::now();
         const auto duration = std::chrono::duration<double, std::milli>(tEnd - tStart).count();
-        cout << message << duration << endl;
+        std::cout << message << duration << std::endl;
     }
 
   private:
@@ -36,15 +35,9 @@ struct Segment
 
 using Bezier   = std::vector<Coord>;
 using Buffer   = std::vector<std::vector<Coord>>;
-using Normals  = std::vector<Segment>;
-using Tangents = std::vector<Segment>;
+using Segments = std::vector<Segment>;
 
 // Point evaluate(const Bezier& curve, double t)
-// {
-
-// }
-
-// Point evaluate(const Bezier& curve, double t, Buffer& buffer)
 // {
 
 // }
@@ -53,8 +46,6 @@ Bezier derivate(const Bezier& curve) {
 
     //: SOURCE: https://pages.mtu.edu/~shene/COURSES/cs3621/NOTES/spline/Bezier/bezier-der.html
     //: COMMENT: pas sur que ca marche ...
-    Bezier C1 = curve;
-    Bezier C2 = curve;
     Bezier retDeriv(curve.size() - 1);
 
     for (size_t i = 1; i < curve.size(); i++) {
@@ -146,103 +137,108 @@ int binomial(int n, int k) {
 
 double bernstein(int m, int i, double u) { return binomial(m, i) * pow(u, i) * pow((1 - u), m - i); }
 
-Coord computeBezier(const std::vector<Coord>& tab, double t) {
+Coord evalBezier(const Bezier& bezier, double t) {
+    const auto n = bezier.size() - 1;
 
     Coord res{0., 0.};
-    for (int i = 0; i < tab.size(); i++) {
-        res.x += bernstein(static_cast<int>(tab.size() - 1), i, t) * tab[i].x;
-        res.y += bernstein(static_cast<int>(tab.size() - 1), i, t) * tab[i].y;
+    for (int i = 0; i <= n; i++) {
+        res.x += bernstein(static_cast<int>(n), i, t) * bezier[i].x;
+        res.y += bernstein(static_cast<int>(n), i, t) * bezier[i].y;
     }
     return res;
 }
 
-void bezier(const std::vector<Coord>& tab, std::vector<Coord>& curve, const int nb_points_on_curve) {
-    for (int i = 0; i <= nb_points_on_curve; i++) {
-        curve.push_back(computeBezier(tab, static_cast<double>(i) / static_cast<double>(nb_points_on_curve) * 1.));
+std::vector<Coord> bezier(const std::vector<Coord>& tab, size_t nb_points_on_curve) {
+    auto curve = std::vector<Coord>();
+    curve.reserve(nb_points_on_curve);
+    for (size_t i = 0; i <= nb_points_on_curve; i++) {
+        curve.push_back(evalBezier(tab, static_cast<double>(i) / static_cast<double>(nb_points_on_curve) * 1.));
     }
+    return curve;
 }
 
-Coord computeCasteljau(Buffer& tmp, double t) {
-    const auto n = tmp[0].size();
-    for (size_t j = 1; j < n; ++j) {
-        for (size_t i = 0; i < n - j; ++i) {
-            const auto& A = tmp[j - 1][i + 1];
-            const auto& B = tmp[j - 1][i];
-            auto&       C = tmp[j][i];
+Coord evalCasteljau(const Bezier& bezier, double t, Buffer& buffer) {
+    //: SOURCE: https://fr.wikipedia.org/wiki/Algorithme_de_Casteljau
+    const auto n = bezier.size() - 1;
+
+    buffer[0] = bezier;
+    for (size_t j = 1; j <= n; ++j) {
+        for (size_t i = 0; i <= n - j; ++i) {
+            const auto& A = buffer[j - 1][i + 1];
+            const auto& B = buffer[j - 1][i];
+            auto&       C = buffer[j][i];
 
             C.x = t * (A.x - B.x) + B.x;
             C.y = t * (A.y - B.y) + B.y;
         }
     }
 
-    return tmp[n - 1][0];
+    return buffer[n][0];
 }
 
-Buffer createBuffer(const Bezier& tab) {
-    Buffer tmp(tab.size());
-    tmp[0] = tab;
-
-    for (int i = 1; i < tab.size(); i++) {
-        tmp[i].resize(tab.size() - i);
+Buffer createBuffer(size_t degree) {
+    Buffer buffer(degree + 1);
+    for (size_t i = 0; i <= degree; i++) {
+        buffer[i].resize(degree + 1 - i);
     }
-    return tmp;
+    return buffer;
 }
 
-void casteljau(const Bezier& tab, std::vector<Coord>& curve, const int nb_points_on_curve) {
-    //: SOURCE: https://fr.wikipedia.org/wiki/Algorithme_de_Casteljau
+std::vector<Coord> casteljau(const Bezier& bezier, size_t nb_points_on_curve) {
+    Buffer bufferCurve = createBuffer(bezier.size() - 1);
 
-    Buffer bufferCurve = createBuffer(tab);
-
-    for (int i = 0; i <= nb_points_on_curve; i++) {
+    auto curve = std::vector<Coord>();
+    curve.reserve(nb_points_on_curve);
+    for (size_t i = 0; i <= nb_points_on_curve; i++) {
         curve.push_back(
-            computeCasteljau(bufferCurve, static_cast<double>(i) / static_cast<double>(nb_points_on_curve) * 1.));
+            evalCasteljau(bezier, static_cast<double>(i) / static_cast<double>(nb_points_on_curve) * 1., bufferCurve));
     }
+    return curve;
 }
 
-void normalsAndTangents(const Bezier&       tab,
-                        std::vector<Coord>& curve,
-                        const int           nb_points_on_curve,
-                        Tangents&           tangents,
-                        Normals&            normals,
-                        double              factor) {
+struct CurveNormalsAndTangents
+{
+    std::vector<Coord> curve;
+    Segments           normals;
+    Segments           tangents;
+};
 
-    Buffer bufferCurve = createBuffer(tab);
-    Bezier deriv       = derivate(tab);
-    Buffer bufferDeriv = createBuffer(deriv);
+CurveNormalsAndTangents normalsAndTangents(const Bezier& bezier, size_t nb_points_on_curve, double factor) {
 
+    Buffer buffer = createBuffer(bezier.size() - 1);
+    Bezier deriv  = derivate(bezier);
+
+    auto result = CurveNormalsAndTangents{};
     for (int i = 0; i <= nb_points_on_curve; i++) {
-        double time = static_cast<double>(i) / static_cast<double>(nb_points_on_curve) * 1.;
+        const double time = static_cast<double>(i) / static_cast<double>(nb_points_on_curve) * 1.;
 
-        Coord curvePoint = computeCasteljau(bufferCurve, time);
+        const Coord curvePoint = evalCasteljau(bezier, time, buffer);
+        result.curve.push_back(curvePoint);
 
-        curve.push_back(curvePoint);
-        Coord deriv_point = computeCasteljau(bufferDeriv, time);
-        Coord tangent     = computeTangent(deriv_point);
-        Coord normal      = computeNormal(tangent);
+        const Coord deriv_point = evalCasteljau(deriv, time, buffer);
+        const Coord tangent     = computeTangent(deriv_point);
+        const Coord normal      = computeNormal(tangent);
 
-        tangents.push_back(Segment({(tangent - curvePoint) * factor, curvePoint}));
-        normals.push_back(Segment({(normal - curvePoint) * factor, curvePoint}));
+        result.tangents.push_back(Segment({curvePoint, curvePoint + tangent * factor}));
+        result.normals.push_back(Segment({curvePoint, curvePoint + normal * factor}));
     }
+    return result;
 }
 
 std::array<Bezier, 2> decompose(const Bezier& curve, double t) {
     // ... TODO
     size_t curve_size = curve.size();
-    Buffer   tmp(curve_size);
 
-    tmp[0] = curve;
+    auto buffer = createBuffer(curve.size() - 1);
 
-    for (int i = 1; i < curve_size; ++i) {
-        tmp[i].resize(curve_size - i);
-    }
-    computeCasteljau(tmp, t);
+    evalCasteljau(curve, t, buffer);
 
     //: SOURCE: https://www.youtube.com/watch?v=lPJo1jayLdc
     Bezier part1, part2(curve_size);
 
     for (size_t i = 0; i < curve_size; ++i) {
-        part1.push_back(tmp[i][0]);
-        part2[curve_size - i - 1] = (tmp[i][curve_size - i - 1]);
+        part1.push_back(buffer[i][0]);
+        part2[curve_size - i - 1] = (buffer[i][curve_size - i - 1]);
     }
     std::array<Bezier, 2> ret = {part1, part2};
     return ret;
@@ -314,10 +310,7 @@ int main(int, char**) {
     // }
 
     {
-        auto     curv_normals = std::vector<Coord>{};
-        Tangents tangents;
-        Normals  normals;
-        normalsAndTangents(points, curv_normals, nb_points_on_curve, tangents, normals, 0.2);
+        const auto [curv_normals, normals, tangents] = normalsAndTangents(points, nb_points_on_curve, 1.);
         writeSegmentsVTK(normals, getResultPath() / "normals.vtk");
         writeLinesVTK(curv_normals, getResultPath() / "curv_normals.vtk");
     }
