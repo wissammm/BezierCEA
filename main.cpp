@@ -8,24 +8,25 @@
 #include <ctime>
 #include <array>
 #include <filesystem>
+#include <Eigen/Dense>
 
-std::filesystem::path getResultPath() { return std::filesystem::u8path(RESULT_DIR); }
+// std::filesystem::path getResultPath() { return std::filesystem::u8path(RESULT_DIR); }
 
-class Timer
-{
-  public:
-    Timer(std::string message) : message(std::move(message)), tStart(std::chrono::high_resolution_clock::now()) {}
+// class Timer
+// {
+//   public:
+//     Timer(std::string message) : message(std::move(message)), tStart(std::chrono::high_resolution_clock::now()) {}
 
-    ~Timer() {
-        const auto tEnd     = std::chrono::high_resolution_clock::now();
-        const auto duration = std::chrono::duration<double, std::milli>(tEnd - tStart).count();
-        std::cout << message << duration << std::endl;
-    }
+//     ~Timer() {
+//         const auto tEnd     = std::chrono::high_resolution_clock::now();
+//         const auto duration = std::chrono::duration<double, std::milli>(tEnd - tStart).count();
+//         std::cout << message << duration << std::endl;
+//     }
 
-  private:
-    std::string                           message;
-    std::chrono::steady_clock::time_point tStart;
-};
+//   private:
+//     std::string                           message;
+//     std::chrono::steady_clock::time_point tStart;
+// };
 
 struct Segment
 {
@@ -36,11 +37,65 @@ struct Segment
 using Bezier   = std::vector<Coord>;
 using Buffer   = std::vector<std::vector<Coord>>;
 using Segments = std::vector<Segment>;
+using Eigen::MatrixXd;
 
-// Point evaluate(const Bezier& curve, double t)
-// {
+Bezier elevate(const Bezier& curve) {
+    Bezier retElevate(curve.size() + 1);
+    retElevate[0] = curve[0];
 
-// }
+    Coord tmpPoint;
+    for (size_t i = 1; i < (curve.size() + 1); i++) {
+        tmpPoint      = (((curve.size() - i) * curve[i]) + (curve[i - 1] * i)) / (curve.size());
+        retElevate[i] = tmpPoint;
+    }
+    retElevate[curve.size()] = curve[curve.size() - 1];
+    return retElevate;
+}
+
+Bezier lower(const Bezier& curve) {
+
+    size_t k = curve.size();
+    size_t n = k - 1;
+    Bezier retLower(n);
+
+    if (k <= 3) {
+        return curve;
+    }
+
+    MatrixXd        M = MatrixXd::Zero(k, n);
+    Eigen::VectorXd Vx(k);
+    Eigen::VectorXd Vy(k);
+
+    for (size_t i = 0; i < k; ++i) {
+        if (i == 0)
+            M(i, 0) = 1;
+        else if (i == n)
+            M(i, i - 1) = 1;
+        else {
+            M(i, i - 1) = 1. / k;
+            M(i, i)     = 1. - M(i, i - 1);
+        }
+
+        Vx(i) = curve[i].x;
+        Vy(i) = curve[i].y;
+    }
+
+    auto Mt = M.transpose();
+    auto Mc = Mt * M;
+    auto Mi = Mc.inverse();
+
+    auto V = Mi * Mt;
+
+    auto nx = V * Vx;
+    auto ny = V * Vy;
+
+    for (size_t i = 0; i < n; ++i) {
+        printf("nx = %f, ny = %f\n", nx(i), ny(i));
+        retLower[i] = Coord({nx(i), ny(i)});
+    }
+
+    return retLower;
+}
 
 Bezier derivate(const Bezier& curve) {
 
@@ -256,64 +311,52 @@ Bezier randomPoint(int n, int y, int x) {
 int main(int, char**) {
     std::cout << "Hello, world!\n";
 
-    const auto points = randomPoint(5, 50, 50);
+    const auto points = randomPoint(6, 50, 50);
 
     Bezier curve_castel;
     Bezier curve_bez;
-    int    nb_points_on_curve = 20;
+    int    nb_points_on_curve = 60;
 
     // {
-    //     // auto timer = Timer{ "Casteljau algorithm with " + std::to_string(nb_points_on_curve) + " points compute. Time : " };
-    //     for (int i = 0; i < 100; ++i)
-    //         casteljau(points, curve_castel, nb_points_on_curve);
-    //     writeLinesVTK(curve_castel, "result/curve_castel.vtk");
+    //     const auto [curv_normals, normals, tangents] = normalsAndTangents(points, nb_points_on_curve, 1.);
+    //     writeSegmentsVTK(normals, "result/normals.vtk");
+    //     writeLinesVTK(curv_normals, "result/curv_normals.vtk");
     // }
 
     // {
-    //     // auto timer = Timer{ "Bezier algorithm with " + std::to_string(nb_points_on_curve) + " points compute. Time : " };
-    //     for (int i = 0; i < 100; ++i)
-    //         bezier(points, curve_bez, nb_points_on_curve);
-    //     writeLinesVTK(curve_bez, "result/curve_bezier.vtk");
-    // }
+    //     Bezier     curve_castel_normal;
+    //     Bezier     curve_castel_plus_1;
+    //     const auto pointsPlus1 = elevate(points);
+    //     curve_castel_normal    = casteljau(points, nb_points_on_curve);
+    //     curve_castel_plus_1    = casteljau(pointsPlus1, nb_points_on_curve);
 
-    // {
-    //     std::cout << "Hello, before decompose!\n";
-    //     Bezier a, b;
-    //     auto arrayDecompose = decompose(points, 0.5);
-    //     a = arrayDecompose[0];
-    //     b = arrayDecompose[1];
-
-    //     auto a_curve = std::vector<Point>{};
-    //     auto b_curve = std::vector<Point>{};
-
-    //     casteljau(a, a_curve, 30);
-    //     casteljau(b, b_curve, 30);
-    //     writeLinesVTK(a_curve, "result/a_curve.vtk");
-    //     writeLinesVTK(b_curve, "result/b_curve.vtk");
-    //     writeLinesVTK(a, "result/a_point.vtk");
-    //     writeLinesVTK(b, "result/b_point.vtk");
-    // }
-
-    // {
-    //     Bezier derivOf = derivate(points);
-    //     auto curv_deriv = std::vector<Point>{};
-    //     casteljau(derivOf, curv_deriv, nb_points_on_curve);
-    //     writeLinesVTK(curv_deriv, "result/curv_deriv.vtk");
-    //     writeLinesVTK(derivOf, "result/point_deriv.vtk");
-    // }
-
-    // {
-    //     // auto timer = Timer{ "Casteljau algorithm with " + std::to_string(nb_points_on_curve) + " points compute. Time : " };
-
-    // casteljau(points, curve_castel, nb_points_on_curve);
-    // writeLinesVTK(curve_castel, "result/curve_castel.vtk");
+    //     writeLinesVTK(points, "result/lines.vtk");
+    //     writeLinesVTK(pointsPlus1, "result/linesPlus1.vtk");
+    //     writeLinesVTK(curve_castel_normal, "result/curve_normal.vtk");
+    //     writeLinesVTK(curve_castel_plus_1, "result/curve_normal_plus_1.vtk");
     // }
 
     {
-        const auto [curv_normals, normals, tangents] = normalsAndTangents(points, nb_points_on_curve, 1.);
-        writeSegmentsVTK(normals, getResultPath() / "normals.vtk");
-        writeLinesVTK(curv_normals, getResultPath() / "curv_normals.vtk");
-    }
+        Bezier curve_castel_normal;
+        Bezier curve_castel_minus_1;
+        Bezier curve_castel_plus_1;
+        Bezier curve_castel_plus_minus_1;
 
-    writeLinesVTK(points, getResultPath() / "lines.vtk");
+        const auto pointsMinus1     = lower(points);
+        const auto pointsPlus1      = elevate(points);
+        const auto pointsPlusMinus1 = lower(pointsPlus1);
+        curve_castel_normal         = casteljau(points, nb_points_on_curve);
+        curve_castel_minus_1        = casteljau(pointsMinus1, nb_points_on_curve);
+        curve_castel_plus_1         = casteljau(pointsPlus1, nb_points_on_curve);
+        curve_castel_plus_minus_1   = casteljau(pointsPlusMinus1, nb_points_on_curve);
+
+        writeLinesVTK(points, "result/lines.vtk");
+        writeLinesVTK(pointsMinus1, "result/linesMinus1.vtk");
+        writeLinesVTK(pointsPlus1, "result/linesPlus1.vtk");
+        writeLinesVTK(pointsPlusMinus1, "result/linesPlusMinus1.vtk");
+        writeLinesVTK(curve_castel_normal, "result/curve.vtk");
+        writeLinesVTK(curve_castel_minus_1, "result/curve_minus_1.vtk");
+        writeLinesVTK(curve_castel_plus_1, "result/curve_plus_1.vtk");
+        writeLinesVTK(curve_castel_plus_minus_1, "result/curve_plus_minus_1.vtk");
+    }
 }
