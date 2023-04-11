@@ -2,21 +2,35 @@
 
 #include <vector>
 
-struct Coord
+struct Coord : Drawable
 {
     double x;
     double y;
 };
 
-struct Segment
+struct Segment : Drawable
 {
     Coord a;
     Coord b;
 };
 
-using Bezier   = std::vector<Coord>;
-using Segments = std::vector<Segment>;
+struct Bezier : Drawable
+{
+    std::vector<Coord> bezier;
+    size_t             size() { return bezier.size(); };    
+};
 
+struct Segments : Drawable
+{
+    std::vector<Segment> segments;
+
+    size_t size() { return segments.size(); };
+
+};
+
+struct Drawable
+{
+};
 
 Coord operator-(const Coord& coord);
 Coord operator+(const Coord& coord1, const Coord& coord2);

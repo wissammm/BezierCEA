@@ -8,6 +8,7 @@ struct Color
     int r, g, b;
 };
 
+
 struct View
 {
   public:

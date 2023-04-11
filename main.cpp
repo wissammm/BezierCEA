@@ -9,6 +9,7 @@
 #include <array>
 #include <filesystem>
 #include "View.h"
+#include <thread>
 
 // std::filesystem::path getResultPath() { return std::filesystem::u8path(RESULT_DIR); }
 
@@ -33,18 +34,17 @@
 
 // }
 
-
-using Buffer   = std::vector<std::vector<Coord>>;
-
+using Buffer = std::vector<std::vector<Coord>>;
 
 Bezier derivate(const Bezier& curve) {
 
     //: SOURCE: https://pages.mtu.edu/~shene/COURSES/cs3621/NOTES/spline/Bezier/bezier-der.html
     //: COMMENT: pas sur que ca marche ...
-    Bezier retDeriv(curve.size() - 1);
+    Bezier retDeriv;
+    retDeriv.bezier = std::vector<Coord>(curve.bezier.size() - 1);
 
-    for (size_t i = 1; i < curve.size(); i++) {
-        retDeriv[i - 1] = (curve[i - 1] - curve[i]) * static_cast<double>(curve.size() - 1);
+    for (size_t i = 1; i < curve.bezier.size(); i++) {
+        retDeriv.bezier[i - 1] = (curve.bezier[i - 1] - curve.bezier[i]) * static_cast<double>(curve.bezier.size() - 1);
     }
     return retDeriv;
 }
@@ -133,12 +133,12 @@ int binomial(int n, int k) {
 double bernstein(int m, int i, double u) { return binomial(m, i) * pow(u, i) * pow((1 - u), m - i); }
 
 Coord evalBezier(const Bezier& bezier, double t) {
-    const auto n = bezier.size() - 1;
+    const auto n = bezier.bezier.size() - 1;
 
     Coord res{0., 0.};
     for (int i = 0; i <= n; i++) {
-        res.x += bernstein(static_cast<int>(n), i, t) * bezier[i].x;
-        res.y += bernstein(static_cast<int>(n), i, t) * bezier[i].y;
+        res.x += bernstein(static_cast<int>(n), i, t) * bezier.bezier[i].x;
+        res.y += bernstein(static_cast<int>(n), i, t) * bezier.bezier[i].y;
     }
     return res;
 }
@@ -147,16 +147,16 @@ std::vector<Coord> bezier(const std::vector<Coord>& tab, size_t nb_points_on_cur
     auto curve = std::vector<Coord>();
     curve.reserve(nb_points_on_curve);
     for (size_t i = 0; i <= nb_points_on_curve; i++) {
-        curve.push_back(evalBezier(tab, static_cast<double>(i) / static_cast<double>(nb_points_on_curve) * 1.));
+        curve.push_back(evalBezier(Bezier({tab}), static_cast<double>(i) / static_cast<double>(nb_points_on_curve) * 1.));
     }
     return curve;
 }
 
 Coord evalCasteljau(const Bezier& bezier, double t, Buffer& buffer) {
     //: SOURCE: https://fr.wikipedia.org/wiki/Algorithme_de_Casteljau
-    const auto n = bezier.size() - 1;
+    const auto n = bezier.bezier.size() - 1;
 
-    buffer[0] = bezier;
+    buffer[0] = bezier.bezier;
     for (size_t j = 1; j <= n; ++j) {
         for (size_t i = 0; i <= n - j; ++i) {
             const auto& A = buffer[j - 1][i + 1];
@@ -180,7 +180,7 @@ Buffer createBuffer(size_t degree) {
 }
 
 std::vector<Coord> casteljau(const Bezier& bezier, size_t nb_points_on_curve) {
-    Buffer bufferCurve = createBuffer(bezier.size() - 1);
+    Buffer bufferCurve = createBuffer(bezier.bezier.size() - 1);
 
     auto curve = std::vector<Coord>();
     curve.reserve(nb_points_on_curve);
@@ -200,7 +200,7 @@ struct CurveNormalsAndTangents
 
 CurveNormalsAndTangents normalsAndTangents(const Bezier& bezier, size_t nb_points_on_curve, double factor) {
 
-    Buffer buffer = createBuffer(bezier.size() - 1);
+    Buffer buffer = createBuffer(bezier.bezier.size() - 1);
     Bezier deriv  = derivate(bezier);
 
     auto result = CurveNormalsAndTangents{};
@@ -214,26 +214,28 @@ CurveNormalsAndTangents normalsAndTangents(const Bezier& bezier, size_t nb_point
         const Coord tangent     = computeTangent(deriv_point);
         const Coord normal      = computeNormal(tangent);
 
-        result.tangents.push_back(Segment({curvePoint, curvePoint + tangent * factor}));
-        result.normals.push_back(Segment({curvePoint, curvePoint + normal * factor}));
+        result.tangents.segments.push_back(Segment({curvePoint, curvePoint + tangent * factor}));
+        result.normals.segments.push_back(Segment({curvePoint, curvePoint + normal * factor}));
     }
     return result;
 }
 
 std::array<Bezier, 2> decompose(const Bezier& curve, double t) {
     // ... TODO
-    size_t curve_size = curve.size();
+    size_t curve_size = curve.bezier.size();
 
-    auto buffer = createBuffer(curve.size() - 1);
+    auto buffer = createBuffer(curve.bezier.size() - 1);
 
     evalCasteljau(curve, t, buffer);
 
     //: SOURCE: https://www.youtube.com/watch?v=lPJo1jayLdc
-    Bezier part1, part2(curve_size);
+    Bezier part1, part2;
+    part1.bezier = std::vector<Coord>(curve_size);
+    part2.bezier = std::vector<Coord>(curve_size);
 
     for (size_t i = 0; i < curve_size; ++i) {
-        part1.push_back(buffer[i][0]);
-        part2[curve_size - i - 1] = (buffer[i][curve_size - i - 1]);
+        part1.bezier.push_back(buffer[i][0]);
+        part2.bezier[curve_size - i - 1] = (buffer[i][curve_size - i - 1]);
     }
     std::array<Bezier, 2> ret = {part1, part2};
     return ret;
@@ -243,7 +245,7 @@ Bezier randomPoint(int n, int y, int x) {
     Bezier random_points;
     for (int i = 0; i < n; i++) {
 
-        random_points.push_back(Coord({static_cast<double>(rand() % x), static_cast<double>(rand() % y)}));
+        random_points.bezier.push_back(Coord({static_cast<double>(rand() % x), static_cast<double>(rand() % y)}));
     }
     return random_points;
 }
@@ -251,33 +253,35 @@ Bezier randomPoint(int n, int y, int x) {
 int main(int, char**) {
     std::cout << "Hello, world!\n";
 
-    const auto points = randomPoint(5, 50, 50);
+    const auto points = randomPoint(5, 400, 400);
 
     Bezier curve_castel;
     Bezier curve_bez;
     int    nb_points_on_curve = 20;
 
-
     {
         const auto [curv_normals, normals, tangents] = normalsAndTangents(points, nb_points_on_curve, 1.);
-        writeSegmentsVTK(normals, "result/normals.vtk");
+        writeSegmentsVTK(normals.segments, "result/normals.vtk");
         writeLinesVTK(curv_normals, "result/curv_normals.vtk");
+        std::cout << "avant boucle"<< std::endl;
+        View        view;
+        std::thread eventThread(&View::createWindow, &view, 600,800);
 
-        View view;
-        int  signal = view.createWindow(600, 800);
-        
-        //:TODO: Changer les boucles pour avoir une vrai fonction 
-        view.changeColor(10,55,255);
-        for(int i = 0 ; i < normals.size() ; ++i){
-            view.drawLine(normals[i]);
+        view.changeColor(10, 55, 255);
+
+        //:TODO: Changer les boucles pour avoir une vrai fonction
+        for (int i = 0; i < normals.segments.size(); ++i) {
+            view.drawLine(normals.segments[i]);
         }
+        std::cout << "apres boucle"<< std::endl;
+        view.changeColor(125, 255, 255);
 
-        view.changeColor(125,255,255);
-        
         view.drawLines(curv_normals);
+
+        eventThread.join();
+
 
     }
 
-    
-    writeLinesVTK(points, "result/lines.vtk");
+    writeLinesVTK(points.bezier, "result/lines.vtk");
 }

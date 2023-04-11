@@ -1,5 +1,7 @@
 #include "View.h"
 #include <SDL2/SDL.h>
+
+
 void View::changeColor(int r, int g, int b) {
     color.r = r;
     color.g = g;
@@ -69,8 +71,9 @@ void View::drawLines(Segments lines) {
 
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 0);
     for (size_t i = 0; i < lines.size(); i++) {
-        drawLine(lines[i]);
+        drawLine(lines.segments[i]);
     }
+    SDL_RenderPresent(renderer);
 }
 
 void View::drawLines(std::vector<Coord> points) {
@@ -79,4 +82,5 @@ void View::drawLines(std::vector<Coord> points) {
     for (size_t i = 0; i < points.size() - 1; i++) {
         drawLine(Segment({points[i], points[i + 1]}));
     }
+    SDL_RenderPresent(renderer);
 }
