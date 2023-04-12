@@ -1,14 +1,12 @@
 #include "Bezier.h"
+#include "Dump.h"
 #include <chrono>
-#include <iostream>
-#include <fstream>
-#include <cmath>
 #include <vector>
 #include <string>
 #include <ctime>
 #include <array>
 #include <filesystem>
-#include <Eigen/Dense>
+
 
 std::filesystem::path getResultPath() { return std::filesystem::u8path(RESULT_DIR); }
 

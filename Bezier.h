@@ -6,6 +6,8 @@
 
 using Bezier = std::vector<Coord>;
 using Eigen::MatrixXd;
+using Buffer   = std::vector<std::vector<Coord>>;
+using Segments = std::vector<Segment>;
 
 struct CurveNormalsAndTangents
 {
