@@ -6,6 +6,15 @@ struct Coord
     double y;
 };
 
+struct Segment
+{
+    Coord a;
+    Coord b;
+};
+
+using Buffer   = std::vector<std::vector<Coord>>;
+using Segments = std::vector<Segment>;
+
 Coord operator-(const Coord& coord);
 Coord operator+(const Coord& coord1, const Coord& coord2);
 Coord operator-(const Coord& coord1, const Coord& coord2);

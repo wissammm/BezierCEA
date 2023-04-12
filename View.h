@@ -14,7 +14,7 @@ struct View{
 
         int createWindow(int h, int w);
         void drawLine(Segment segment);
-        void drawLines()
+        void drawLines();
         void changeColor(int r, int g, int b);
 
     private:

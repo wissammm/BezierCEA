@@ -13,6 +13,10 @@ add_library(Coord Coord.h Coord.cpp)
 add_library(Bezier Bezier.h Bezier.cpp)
 target_link_libraries (Bezier PUBLIC Coord Eigen3::Eigen)
 
+add_library(Dump Dump.h Dump.cpp)
+target_link_libraries (Dump PUBLIC Bezier)
+
+
 add_executable(BezierMain BezierMain.cpp)
 target_compile_definitions(BezierMain PRIVATE "RESULT_DIR=\"${CMAKE_CURRENT_LIST_DIR}/result\"")
-target_link_libraries (BezierMain PRIVATE Bezier)
+target_link_libraries (BezierMain PRIVATE Bezier Dump)
