@@ -1,7 +1,38 @@
 #include "View.h"
 #include <SDL2/SDL.h>
+#include <string>
+#include <iostream>
 
 
+typedef void (*Menu_Processing_Function_Pointer)(void);
+
+
+
+using Selection = std::vector<char * >;
+
+void printSelection(Selection selection){
+    for(int i = 0;i < selection.size();++i){
+        std::cout << i+1 << " : " << selection[i] << std::endl;
+    }
+}
+
+int chooseSelection(size_t max){
+    int choice;
+    std::cin >> choice;
+    if(choice -1 >max){
+        return -1;
+    }
+    return choice -1;
+}
+
+int menuCLI() {
+    
+    std::cout << "Enter selection, 0 to quit: ";
+    char choice;
+    std::cin >> choice;
+    
+    return EXIT_SUCCESS;
+}
 
 void View::changeColor(int r, int g, int b) {
     color.r = r;
@@ -48,10 +79,15 @@ int View::createWindow(int h, int w) {
         }
 
         // Initialize renderer color white for the background
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+        SDL_SetRenderDrawColor(renderer, 0, 40, 0, 0);
 
         // Clear screen
         SDL_RenderClear(renderer);
+
+        changeColor(50, 89, 200);
+        Segment a({Coord({0, 0}), Coord({40, 60})});
+
+        drawLine(a);
 
         // Update screen
         SDL_RenderPresent(renderer);
