@@ -10,23 +10,21 @@
 #include <filesystem>
 #include <Eigen/Dense>
 
-// std::filesystem::path getResultPath() { return std::filesystem::u8path(RESULT_DIR); }
+std::filesystem::path getResultPath() { return std::filesystem::u8path(RESULT_DIR); }
 
-// class Timer
-// {
-//   public:
-//     Timer(std::string message) : message(std::move(message)), tStart(std::chrono::high_resolution_clock::now()) {}
-
-//     ~Timer() {
-//         const auto tEnd     = std::chrono::high_resolution_clock::now();
-//         const auto duration = std::chrono::duration<double, std::milli>(tEnd - tStart).count();
-//         std::cout << message << duration << std::endl;
-//     }
-
-//   private:
-//     std::string                           message;
-//     std::chrono::steady_clock::time_point tStart;
-// };
+ class Timer
+ {
+   public:
+     Timer(std::string message) : message(std::move(message)), tStart(std::chrono::high_resolution_clock::now()) {}
+     ~Timer() {
+         const auto tEnd     = std::chrono::high_resolution_clock::now();
+         const auto duration = std::chrono::duration<double, std::milli>(tEnd - tStart).count();
+         std::cout << message << duration << std::endl;
+     }
+   private:
+     std::string                           message;
+     std::chrono::high_resolution_clock::time_point tStart;
+ };
 
 struct Segment
 {
@@ -337,12 +335,14 @@ int main(int, char**) {
     // }
 
     {
+        auto timer = Timer{"test timer: "};
+
         Bezier curve_castel_normal;
         Bezier curve_castel_minus_1;
         Bezier curve_castel_plus_1;
         Bezier curve_castel_plus_minus_1;
 
-        const auto pointsMinus1     = lower(points);
+        const auto pointsMinus1     = lower(points); 
         const auto pointsPlus1      = elevate(points);
         const auto pointsPlusMinus1 = lower(pointsPlus1);
         curve_castel_normal         = casteljau(points, nb_points_on_curve);
@@ -350,13 +350,14 @@ int main(int, char**) {
         curve_castel_plus_1         = casteljau(pointsPlus1, nb_points_on_curve);
         curve_castel_plus_minus_1   = casteljau(pointsPlusMinus1, nb_points_on_curve);
 
-        writeLinesVTK(points, "result/lines.vtk");
-        writeLinesVTK(pointsMinus1, "result/linesMinus1.vtk");
-        writeLinesVTK(pointsPlus1, "result/linesPlus1.vtk");
-        writeLinesVTK(pointsPlusMinus1, "result/linesPlusMinus1.vtk");
-        writeLinesVTK(curve_castel_normal, "result/curve.vtk");
-        writeLinesVTK(curve_castel_minus_1, "result/curve_minus_1.vtk");
-        writeLinesVTK(curve_castel_plus_1, "result/curve_plus_1.vtk");
-        writeLinesVTK(curve_castel_plus_minus_1, "result/curve_plus_minus_1.vtk");
+        create_directories(getResultPath());
+        writeLinesVTK(points, getResultPath() / "lines.vtk");
+        writeLinesVTK(pointsMinus1, getResultPath() / "linesMinus1.vtk");
+        writeLinesVTK(pointsPlus1, getResultPath() / "linesPlus1.vtk");
+        writeLinesVTK(pointsPlusMinus1, getResultPath() / "linesPlusMinus1.vtk");
+        writeLinesVTK(curve_castel_normal, getResultPath() / "curve.vtk");
+        writeLinesVTK(curve_castel_minus_1, getResultPath() / "curve_minus_1.vtk");
+        writeLinesVTK(curve_castel_plus_1, getResultPath() / "curve_plus_1.vtk");
+        writeLinesVTK(curve_castel_plus_minus_1, getResultPath() / "curve_plus_minus_1.vtk");
     }
 }
