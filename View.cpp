@@ -2,6 +2,7 @@
 #include <SDL2/SDL.h>
 
 
+
 void View::changeColor(int r, int g, int b) {
     color.r = r;
     color.g = g;
@@ -71,7 +72,7 @@ void View::drawLines(Segments lines) {
 
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 0);
     for (size_t i = 0; i < lines.size(); i++) {
-        drawLine(lines.segments[i]);
+        drawLine(lines[i]);
     }
     SDL_RenderPresent(renderer);
 }

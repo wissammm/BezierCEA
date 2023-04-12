@@ -1,6 +1,7 @@
 #pragma once
 #include <SDL2/SDL.h>
 #include "Coord.h"
+#include "Bezier.h"
 #include <vector>
 
 struct Color
