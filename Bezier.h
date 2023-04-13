@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Coord.h"
+#include "Color.h"
 #include <vector>
 #include <Eigen/Dense>
 
@@ -14,6 +15,14 @@ struct CurveNormalsAndTangents
     std::vector<Coord> curve;
     Segments           normals;
     Segments           tangents;
+};
+
+struct Curve{
+    uint id;
+    Bezier bezier;
+    std::vector<Coord> points;
+    std::string name;
+    Color c = Color(20,20,20);
 };
 
 Bezier                  elevate(const Bezier& curve);

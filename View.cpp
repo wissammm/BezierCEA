@@ -1,43 +1,91 @@
 #include "View.h"
+#include "Bezier.h"
+#include "Cli.h"
 #include <SDL2/SDL.h>
 #include <string>
 #include <iostream>
 
+#define NB_POINTS_ON_CURVE 150
+using Selection = std::vector<std::string>;
+int id = 0;
 
-typedef void (*Menu_Processing_Function_Pointer)(void);
 
-
-
-using Selection = std::vector<char * >;
-
-void printSelection(Selection selection){
-    for(int i = 0;i < selection.size();++i){
-        std::cout << i+1 << " : " << selection[i] << std::endl;
-    }
-}
-
-int chooseSelection(size_t max){
-    int choice;
+size_t inInt(size_t const& max) {
+    size_t choice;
     std::cin >> choice;
-    if(choice -1 >max){
+    if (choice > max) {
         return -1;
     }
-    return choice -1;
+    return choice;
 }
 
-int menuCLI() {
-    
-    std::cout << "Enter selection, 0 to quit: ";
-    char choice;
+std::vector<Coord> getPositions(size_t& nbPoints) {
+    double             x, y;
+    std::vector<Coord> positions;
+    for (size_t i = 0; i < nbPoints; ++i) {
+        std::cout << "x" << i + 1;
+        std::cin >> x;
+        std::cout << "y" << i + 1;
+        std::cin >> y;
+        positions.push_back(Coord({x, y}));
+    }
+
+    return positions;
+}
+
+std::string chooseName() {
+    std::string choice;
     std::cin >> choice;
+    return choice;
+}
+
+std::vector<std::string> menu_principal ={
+    std::string("Créer courbe de bézier"),
+    std::string("Supprimer courbe de bézier"),
+    std::string("Afficher les normales"),
+    std::string("Ajouter un point"),
+    std::string("Supprimer un point"),
+};
+
+Curve createCurve() {
+    Curve curveReturn;
+    std::cout << "Nom : ";
+    curveReturn.name = chooseName();
+    std::cout << "Nombre de points : ";
+    size_t nbPoint = inInt(100);
+    // if (nbPoint == -1)
+    //     SDL_Error;
+
+    std::cout << "aléatoire 0, sinon 1" << std::endl;
+    int selec = inInt(100000000000);
+
+    //TODO:Wissam: Choisir la taille de fenetre de view
+    if (selec + 1 == 2)
+        curveReturn.bezier = getPositions(nbPoint);
+    else
+        curveReturn.bezier = randomPoint(nbPoint, 600, 400);
+    curveReturn.id = ++id;
+    curveReturn.c.randomColor();
+    curveReturn.points = casteljau(curveReturn.bezier,NB_POINTS_ON_CURVE);
+    return curveReturn;
+}
+
+int View::menuCLI() {
+
+    std::cout << "Menu" << std::endl;
+    std::cout << "0 : Quitter" <<  std::endl;
+    // printSelection(menu_principal);
+    for (int i = 0; i < menu_principal.size(); ++i) {
+        std::cout << i + 1 << " : " << menu_principal[i] << std::endl;
+    }
+    size_t choosen = inInt(static_cast<size_t>(menu_principal.size() + 1));
+    Curve curve;
+
+    if(choosen == 1){
+        curves.push_back(createCurve());
+    }
     
     return EXIT_SUCCESS;
-}
-
-void View::changeColor(int r, int g, int b) {
-    color.r = r;
-    color.g = g;
-    color.b = b;
 }
 
 int View::createWindow(int h, int w) {
@@ -46,7 +94,7 @@ int View::createWindow(int h, int w) {
     SDL_Init(SDL_INIT_VIDEO); // Initialize SDL2
 
     // Create an application window with the following settings:
-    window = SDL_CreateWindow("An SDL2 window",                    //    window title
+    window = SDL_CreateWindow("Bezier",                            //    window title
                               SDL_WINDOWPOS_UNDEFINED,             //    initial x position
                               SDL_WINDOWPOS_UNDEFINED,             //    initial y position
                               w,                                   //    width, in pixels
@@ -79,18 +127,24 @@ int View::createWindow(int h, int w) {
         }
 
         // Initialize renderer color white for the background
-        SDL_SetRenderDrawColor(renderer, 0, 40, 0, 0);
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
 
         // Clear screen
         SDL_RenderClear(renderer);
 
-        changeColor(50, 89, 200);
-        Segment a({Coord({0, 0}), Coord({40, 60})});
-
-        drawLine(a);
+        color.changeColor(1, 1, 1);
+        
 
         // Update screen
         SDL_RenderPresent(renderer);
+
+        int signal = menuCLI();
+
+        for (size_t i = 0; i<curves.size() ;++i){
+            color = curves[i].c;
+            drawLines(curves[i].points);
+        }
+        while(true){}
     }
     return 0;
 }

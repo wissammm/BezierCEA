@@ -10,11 +10,18 @@ find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 
 add_library(Coord Coord.h Coord.cpp)
 
+add_library(Color Color.h Color.cpp)
+
+add_library(Cli Cli.h Cli.cpp)
+
 add_library(Bezier Bezier.h Bezier.cpp)
-target_link_libraries (Bezier PUBLIC Coord Eigen3::Eigen)
+target_link_libraries (Bezier PUBLIC Coord Eigen3::Eigen Color)
 
 add_library(Dump Dump.h Dump.cpp)
 target_link_libraries (Dump PUBLIC Bezier)
+
+
+target_link_libraries (Cli PUBLIC Bezier)
 
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})

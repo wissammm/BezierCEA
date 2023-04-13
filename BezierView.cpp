@@ -13,11 +13,6 @@ std::filesystem::path getResultPath() { return std::filesystem::u8path(RESULT_DI
 int main(int, char**) {
     std::cout << "Bienvenue dans la petite IHM\n";
 
-    const auto points = randomPoint(6, 50, 50);
-
-    Bezier curve_castel;
-    int    nb_points_on_curve = 60;
-
     View  view;
     view.createWindow(400,600);
 
