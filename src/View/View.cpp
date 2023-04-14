@@ -1,5 +1,5 @@
-#include "View.h"
-#include "Bezier.h"
+#include "View/View.h"
+#include "Bezier/Bezier.h"
 #include "Cli.h"
 #include <SDL2/SDL.h>
 #include <string>

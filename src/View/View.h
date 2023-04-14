@@ -1,8 +1,8 @@
 #pragma once
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
-#include "Coord.h"
-#include "Bezier.h"
+#include "Geometry/Coord.h"
+#include "Bezier/Bezier.h"
 #include "Cli.h"
 #include "Color.h"
 #include <vector>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Bezier.h"
+#include "Bezier/Bezier.h"
 #include <iostream>
 #include <fstream>
 #include <vector>

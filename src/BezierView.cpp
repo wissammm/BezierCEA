@@ -1,6 +1,6 @@
-#include "src/Bezier.h"
-#include "src/Dump.h"
-#include "src/View.h"
+#include "Bezier/Bezier.h"
+#include "IO/Dump.h"
+#include "View/View.h"
 #include <chrono>
 #include <vector>
 #include <string>

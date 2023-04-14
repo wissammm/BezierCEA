@@ -1,6 +1,8 @@
 #pragma once
-#include "Bezier.h"
-#include "Coord.h"
+#include "Bezier/Bezier.h"
+#include "Geometry/Coord.h"
+#include "View/View.h"
+#include "View/CurveDraw.h"
 
 
 using Selection = std::vector<std::string>;

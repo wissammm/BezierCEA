@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Coord.h"
-#include "Color.h"
+#include "Geometry/Coord.h"
+#include "Geometry/Segment.h"
 #include <vector>
 #include <Eigen/Dense>
 
@@ -17,13 +17,6 @@ struct CurveNormalsAndTangents
     Segments           tangents;
 };
 
-struct Curve{
-    uint id;
-    Bezier bezier;
-    std::vector<Coord> points;
-    std::string name;
-    Color c = Color(20,20,20);
-};
 
 Bezier                  elevate(const Bezier& curve);
 Bezier                  derivate(const Bezier& curve);
