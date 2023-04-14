@@ -17,6 +17,7 @@ find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 add_library(Bezier 
             Bezier/Bezier.h Bezier/Bezier.cpp
             Bezier/BezierDecompose.h Bezier/BezierDecompose.cpp
+            Bezier/BezierNormal.h Bezier/BezierNormal.cpp
             Bezier/BezierDerivate.h Bezier/BezierDerivate.cpp
             Bezier/BezierElevate.h Bezier/BezierElevate.cpp
             Bezier/BezierEvaluate.h Bezier/BezierEvaluate.cpp
