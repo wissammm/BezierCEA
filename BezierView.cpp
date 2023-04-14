@@ -14,6 +14,6 @@ int main(int, char**) {
     std::cout << "Bienvenue dans la petite IHM\n";
 
     View  view;
-    view.createWindow(400,600);
+    view.createWindow();
 
 }

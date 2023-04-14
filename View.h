@@ -1,5 +1,6 @@
 #pragma once
-#include <SDL2/SDL.h>
+#include <SDL.h>
+
 #include "Coord.h"
 #include "Bezier.h"
 #include "Cli.h"
@@ -13,7 +14,7 @@ using Curves= std::vector<Curve>;
 struct View
 {
   public:
-    int           createWindow(int h, int w);
+    int           createWindow();
     Color         color = Color(0, 255, 255);
     SDL_Window*   window;
     SDL_Renderer* renderer;

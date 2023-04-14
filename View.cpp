@@ -6,6 +6,8 @@
 #include <iostream>
 
 #define NB_POINTS_ON_CURVE 150
+#define WIDTH 900
+#define HEIGHT 700
 using Selection = std::vector<std::string>;
 int id = 0;
 
@@ -23,9 +25,9 @@ std::vector<Coord> getPositions(size_t& nbPoints) {
     double             x, y;
     std::vector<Coord> positions;
     for (size_t i = 0; i < nbPoints; ++i) {
-        std::cout << "x" << i + 1;
+        std::cout << "x" << i + 1 <<" ";
         std::cin >> x;
-        std::cout << "y" << i + 1;
+        std::cout << "y" << i + 1 <<" ";
         std::cin >> y;
         positions.push_back(Coord({x, y}));
     }
@@ -42,7 +44,6 @@ std::string chooseName() {
 std::vector<std::string> menu_principal ={
     std::string("Créer courbe de bézier"),
     std::string("Supprimer courbe de bézier"),
-    std::string("Afficher les normales"),
     std::string("Ajouter un point"),
     std::string("Supprimer un point"),
 };
@@ -88,7 +89,7 @@ int View::menuCLI() {
     return EXIT_SUCCESS;
 }
 
-int View::createWindow(int h, int w) {
+int View::createWindow() {
     //:SOURCE: https://stackoverflow.com/questions/14646208/adding-sdl-library-to-my-program
 
     SDL_Init(SDL_INIT_VIDEO); // Initialize SDL2
@@ -97,8 +98,8 @@ int View::createWindow(int h, int w) {
     window = SDL_CreateWindow("Bezier",                            //    window title
                               SDL_WINDOWPOS_UNDEFINED,             //    initial x position
                               SDL_WINDOWPOS_UNDEFINED,             //    initial y position
-                              w,                                   //    width, in pixels
-                              h,                                   //    height, in pixels
+                              WIDTH,                                   //    width, in pixels
+                              HEIGHT,                                   //    height, in pixels
                               SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL //    flags - see below
     );
 
@@ -144,7 +145,6 @@ int View::createWindow(int h, int w) {
             color = curves[i].c;
             drawLines(curves[i].points);
         }
-        while(true){}
     }
     return 0;
 }
@@ -157,6 +157,7 @@ void View::drawLine(Segment segment) {
     // Update screen
     SDL_RenderPresent(renderer);
 }
+
 
 void View::drawLines(Segments lines) {
 
