@@ -1,5 +1,5 @@
-#include "Bezier.h"
-#include "Dump.h"
+#include "src/Bezier.h"
+#include "src/Dump.h"
 #include <chrono>
 #include <vector>
 #include <string>

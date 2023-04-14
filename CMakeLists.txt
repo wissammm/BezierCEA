@@ -8,16 +8,16 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
 
 find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 
-add_library(Coord Coord.h Coord.cpp)
+add_library(Coord src/Coord.h src/Coord.cpp)
 
-add_library(Color Color.h Color.cpp)
+add_library(Color src/Color.h src/Color.cpp)
 
-add_library(Cli Cli.h Cli.cpp)
+add_library(Cli src/Cli.h src/Cli.cpp)
 
-add_library(Bezier Bezier.h Bezier.cpp)
+add_library(Bezier src/Bezier.h src/Bezier.cpp)
 target_link_libraries (Bezier PUBLIC Coord Eigen3::Eigen Color)
 
-add_library(Dump Dump.h Dump.cpp)
+add_library(Dump src/Dump.h src/Dump.cpp)
 target_link_libraries (Dump PUBLIC Bezier)
 
 
@@ -31,7 +31,7 @@ include_directories(${SDL2_INCLUDE_DIRS})
 find_package(SDL2_gfx REQUIRED)
 
 
-add_library(View View.h View.cpp)
+add_library(View src/View.h src/View.cpp)
 target_link_libraries (View PUBLIC Bezier ${SDL2_LIBRARIES})
 
 add_executable(BezierMain BezierMain.cpp)
