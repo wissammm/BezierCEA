@@ -16,8 +16,8 @@ struct Curve
     Bezier controlPoint;
     size_t nbControlPoint;
     size_t degree;
-    Curve();
-    Curve(const size_t n) {
+    
+    Curve( size_t n) {
         controlPoint   = Bezier(nbControlPoint);
         nbControlPoint = n;
         degree         = nbControlPoint - 1;
@@ -27,6 +27,8 @@ struct Curve
         nbControlPoint = controlPoint.size();
         degree         = nbControlPoint - 1;
     }
+    // Curve();
+    Curve() = default;
 };
 
 struct CurveNormalsAndTangents

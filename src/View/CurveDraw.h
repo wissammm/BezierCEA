@@ -1,10 +1,11 @@
 #pragma once
 #include "View/Color.h"
+#include "Bezier/Bezier.h"
 #include <string>
 
-struct Curve{
+struct CurveDraw{
     uint id;
-    Bezier bezier;
+    Curve bezier;
     std::vector<Coord> points;
     std::string name;
     Color c = Color(20,20,20);

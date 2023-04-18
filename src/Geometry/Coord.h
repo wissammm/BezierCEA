@@ -8,6 +8,9 @@ struct Coord
     double y;
 };
 
+Coord computeTangent(Coord deriv_time_t);
+Coord computeNormal(Coord tengent);
+
 
 Coord operator-(const Coord& coord);
 Coord operator+(const Coord& coord1, const Coord& coord2);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Bezier/Bezier.h"
+#include "Geometry/Segment.h"
 #include <iostream>
 #include <fstream>
 #include <vector>

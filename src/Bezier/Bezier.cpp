@@ -18,9 +18,8 @@ Buffer createBuffer(size_t degree) {
     return buffer;
 }
 
-
 Curve randomPoint(int n, int y, int x) {
-    Curve random_points;
+    Curve random_points = Curve(n);
     for (int i = 0; i < n; i++) {
 
         random_points.controlPoint.push_back(Coord({static_cast<double>(rand() % x), static_cast<double>(rand() % y)}));

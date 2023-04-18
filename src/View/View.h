@@ -1,15 +1,15 @@
 #pragma once
 #include <SDL2/SDL.h>
-
 #include "Geometry/Coord.h"
 #include "Bezier/Bezier.h"
+#include "View/CurveDraw.h"
 #include "Cli.h"
 #include "Color.h"
 #include <vector>
 #include <random>
 
 
-using Curves= std::vector<Curve>;
+using Curves= std::vector<CurveDraw>;
 
 struct View
 {
