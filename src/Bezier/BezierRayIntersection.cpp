@@ -1,10 +1,11 @@
 #include "BezierRayIntersection.h"
 #include "Bezier.h"
+#include "BezierEvaluate.h"
+#include "BezierDerivate.h"
+#include "BezierDecompose.h"
 #include <algorithm>
 #include <math.h>
 
-// Given three collinear points p, q, r, the function checks if
-// point q lies on line segment 'pr'
 bool onSegment(Coord p, Coord q, Coord r) {
     if (q.x <= std::max(p.x, r.x) && q.x >= std::min(p.x, r.x) && q.y <= std::max(p.y, r.y) &&
         q.y >= std::min(p.y, r.y)) {
@@ -14,11 +15,6 @@ bool onSegment(Coord p, Coord q, Coord r) {
     return false;
 }
 
-// To find orientation of ordered triplet (p, q, r).
-// The function returns following values
-// 0 --> p, q and r are collinear
-// 1 --> Clockwise
-// 2 --> Counterclockwise
 int orientation(Coord p, Coord q, Coord r) {
     // See https://www.geeksforgeeks.org/orientation-3-ordered-points/
     // for details of below formula.
@@ -30,9 +26,7 @@ int orientation(Coord p, Coord q, Coord r) {
     return (val > 0) ? 1 : 2; // clock or counterclock wise
 }
 
-// The main function that returns true if line segment 'p1q1'
-// and 'p2q2' intersect.
-bool doIntersect(Coord p1, Coord q1, Coord p2, Coord q2) {
+bool doIntersect(Coord p1, Coord q1, Coord p2, Coord q2, Coord& intersect) {
     // Find the four orientations needed for general and
     // special cases
     int o1 = orientation(p1, q1, p2);
@@ -64,6 +58,16 @@ bool doIntersect(Coord p1, Coord q1, Coord p2, Coord q2) {
     return false; // Doesn't fall in any of the above cases
 }
 
+bool touchHull(Curve bez, Segment seg) {
+    if (doIntersect(bez.controlPoint[0], bez.controlPoint[bez.degree], seg.a, seg.b))
+        return true;
+    for (int i = 0; i < bez.degree; ++i) {
+        if (doIntersect(bez.controlPoint[i], bez.controlPoint[i + 1], seg.a, seg.b))
+            return true;
+    }
+    return false;
+}
+
 std::vector<Coord> translatePointsTo0(std::vector<Coord> bez) {
     // translate so that the curve starts at (0,0)
     std::vector<Coord> translate(bez.size());
@@ -87,15 +91,48 @@ std::vector<Coord> rotateToX(std::vector<Coord> bez) {
     return rotate;
 }
 
-std::vector<Coord> intersection(std::vector<Coord> bez, Segment seg){
-    // Etape 1 : trouver les first guests, avec la méthode de Thibaud 
-        // A faire 
-    // Etape 2 : translate et rotate Seg sur l'axe 0, appliquer la meme transformation à bez et à ses first guests   
-        // seg sur l'axe 0 : fait;
-        // à faire 
+std::vector<double> firstGuesses(Curve bez, Segment seg) { return std::vector<double>(); }
 
-    // Etape 3 : résoudre f(x) = 0, avec la méthode de newton 
-        //à faire 
+double newtonMethod(Curve bez, double guess, Segment seg, double epsilone) {
+    Curve deriv = derivate(bez);
+
+    double x = guess;
+    //search x
+    Buffer bufferCurve  = createBuffer(bez.degree);
+    Buffer bufferDerive = createBuffer(bez.degree);
+    double a            = (seg.a.y - seg.b.y / seg.a.x - seg.b.x);
+    double b            = -a * seg.b.x + seg.b.y;
+    while (std::abs(guess - x) > epsilone)
+    {
+        guess = x;
+        x     = guess - (evalCasteljau(bez, guess, bufferCurve) / evalCasteljau(deriv, guess, bufferDerive)) -
+            (a * x + b);
+    }
+
+    return x;
 }
 
+std::vector<Coord> intersectionNewtonMethod(Curve bez, Segment seg, double epsilone) {
+    // Etape 0 : vérifiation boite englobante
+    if (!touchHull(bez, seg)) {
+        return std::vector<Coord>();
+    }
+    Buffer bufferCurve = createBuffer(bez.degree);
+    Coord  guess       = evalCasteljau(bez, newtonMethod(bez, 0.5, seg, 0.1), bufferCurve);
+    // Etape 1 : translate et rotate Seg sur l'axe 0, appliquer la meme transformation à bez et à ses first guests
+    // seg sur l'axe 0 : fait;
+    // à faire
 
+    // Etape 1 : trouver les first guests, avec la méthode de Thibaud
+    // A faire : firstGuesses()
+
+    // Etape 3 : résoudre f(x) = 0, avec la méthode de newton pour chaque guess
+    // Fait
+    return std::vector<Coord>({guess});
+}
+
+std::vector<Coord> intersectionNaive(Curve bez, Segment seg) {
+
+    Coord guess;
+    return std::vector<Coord>({guess});
+}
