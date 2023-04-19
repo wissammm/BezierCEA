@@ -1,0 +1,8 @@
+# vtk DataFile Version 2.0
+CGT vtk points output
+ASCII
+DATASET POLYDATA
+POINTS 1 float
+3.53977 0 0
+VERTICES 1 2
+1 0

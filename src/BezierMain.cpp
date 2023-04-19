@@ -1,4 +1,5 @@
 #include "Bezier/Bezier.h"
+#include "Bezier/BezierRayIntersection.h"
 #include "IO/Dump.h"
 #include <chrono>
 #include <vector>
@@ -34,29 +35,20 @@ int main(int, char**) {
     int    nb_points_on_curve = 60;
 
     {
-        auto timer = Timer{"test timer: "};
+        auto    timer = Timer{"test timer: "};
+        Bezier  bez   = Bezier({
+            Coord({1.0, 7.0}),
+            Coord({8.0, -12.0}),
+            Coord({11.0, -23.0}),
+        });
+        Segment A     = Segment({Coord({0.0, 0.0}), Coord({100.0, 0.0})});
+        auto    naive = intersectionNaive(bez, A);
 
-        Bezier curve_castel_normal;
-        Bezier curve_castel_minus_1;
-        Bezier curve_castel_plus_1;
-        Bezier curve_castel_plus_minus_1;
+        std::cout << "Intesect naive \n x: " << naive[0].x << " y :" << naive[0].y << std::endl;
 
-        const auto pointsMinus1     = lower(points);
-        const auto pointsPlus1      = elevate(points);
-        const auto pointsPlusMinus1 = lower(pointsPlus1);
-        curve_castel_normal         = casteljau(points, nb_points_on_curve);
-        curve_castel_minus_1        = casteljau(pointsMinus1, nb_points_on_curve);
-        curve_castel_plus_1         = casteljau(pointsPlus1, nb_points_on_curve);
-        curve_castel_plus_minus_1   = casteljau(pointsPlusMinus1, nb_points_on_curve);
+        writePointsVTK(naive, "intersect_points ");
+        auto newton = intersectionNewtonMethod(bez,A,0.1);
 
-        create_directories(getResultPath());
-        writeLinesVTK(points.controlPoint, getResultPath() / "lines.vtk");
-        writeLinesVTK(pointsMinus1.controlPoint, getResultPath() / "linesMinus1.vtk");
-        writeLinesVTK(pointsPlus1.controlPoint, getResultPath() / "linesPlus1.vtk");
-        writeLinesVTK(pointsPlusMinus1.controlPoint, getResultPath() / "linesPlusMinus1.vtk");
-        writeLinesVTK(curve_castel_normal, getResultPath() / "curve.vtk");
-        writeLinesVTK(curve_castel_minus_1, getResultPath() / "curve_minus_1.vtk");
-        writeLinesVTK(curve_castel_plus_1, getResultPath() / "curve_plus_1.vtk");
-        writeLinesVTK(curve_castel_plus_minus_1, getResultPath() / "curve_plus_minus_1.vtk");
+        // std::cout << "Intesect newton \n x: " << newton[0].x << " y :"<<newton[0].y <<std::endl;
     }
 }
