@@ -28,26 +28,29 @@ class Timer
 int main(int, char**) {
     std::cout << "Hello, world!\n";
 
-    const auto points = randomPoint(6, 50, 50);
+    //  const auto points = randomPoint(6, 50, 50);
 
     Bezier curve_castel;
     Bezier curve_bez;
     int    nb_points_on_curve = 60;
 
     {
-        auto    timer = Timer{"test timer: "};
-        Bezier  bez   = Bezier({
+        auto  timer = Timer{"test timer: "};
+        Curve bez   = Curve(Bezier({
             Coord({1.0, 7.0}),
             Coord({8.0, -12.0}),
             Coord({11.0, -23.0}),
-        });
+        }));
+
         Segment A     = Segment({Coord({0.0, 0.0}), Coord({100.0, 0.0})});
-        auto    naive = intersectionNaive(bez, A);
+        auto    naive = intersectionNaive(bez, A, 1000);
 
-        std::cout << "Intesect naive \n x: " << naive[0].x << " y :" << naive[0].y << std::endl;
+        std::cout <<"Naive size = "<< naive.size()<< " Intesect naive \n x: " << naive[0].intersection.x << " y :" << naive[0].intersection.y
+                  << std::endl;
 
-        auto newton = intersectionNewtonMethod(bez,A,0.1);
+        auto newton = intersectionNewtonMethod(bez, A, 0.01);
 
-        // std::cout << "Intesect newton \n x: " << newton[0].x << " y :"<<newton[0].y <<std::endl;
+        std::cout <<"Newton size = "<< newton.size()<<" Intesect newton \n x: " << newton[0].intersection.x << " y :" << newton[0].intersection.y
+                  << std::endl;
     }
 }

@@ -16,9 +16,9 @@ struct Curve
     Bezier controlPoint;
     size_t nbControlPoint;
     size_t degree;
-    
-    Curve( size_t n) {
-        controlPoint   = Bezier(nbControlPoint);
+
+    Curve(size_t n) {
+        controlPoint   = Bezier(n);
         nbControlPoint = n;
         degree         = nbControlPoint - 1;
     };
@@ -30,6 +30,7 @@ struct Curve
     // Curve();
     Curve() = default;
 };
+using Curves   = std::vector<Curve>;
 
 struct CurveNormalsAndTangents
 {
@@ -38,6 +39,7 @@ struct CurveNormalsAndTangents
     Segments           tangents;
 };
 
+Curve                   translatePointsToP(Curve bez, Coord p);
 Curve                   elevate(const Curve& curve);
 Curve                   derivate(const Curve& curve);
 Curve                   lower(const Curve& curve);
