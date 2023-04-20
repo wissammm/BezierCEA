@@ -46,7 +46,6 @@ int main(int, char**) {
 
         std::cout << "Intesect naive \n x: " << naive[0].x << " y :" << naive[0].y << std::endl;
 
-        writePointsVTK(naive, "intersect_points ");
         auto newton = intersectionNewtonMethod(bez,A,0.1);
 
         // std::cout << "Intesect newton \n x: " << newton[0].x << " y :"<<newton[0].y <<std::endl;
