@@ -5,8 +5,6 @@
 #include "BezierDecompose.h"
 #include <algorithm>
 #include <math.h>
-
-#define TOLERANCE 0.1
 #include <iostream>
 #include <cmath>
 using namespace std;
