@@ -43,12 +43,12 @@ int main(int, char**) {
         }));
 
         Segment A     = Segment({Coord({0.0, 0.0}), Coord({100.0, 0.0})});
-        auto    naive = intersectionNaive(bez, A, 1000);
+        auto    naive = intersectionNaive(bez, A, 100);
         std::cout <<"Naive size  = "<< naive.size() << std::endl;
         std::cout << " Intesect naive \n x: " << naive[0].inter.x << " y :" << naive[0].inter.y
                   << std::endl;
 
-        auto newton = intersectionNewtonMethod(bez, A, 0.01);
+        auto newton = intersectionNewtonMethod(bez, A, 0.001);
 
         std::cout <<"Newton size = "<< newton.size()<<" Intesect newton \n x: " << newton[0].inter.x << " y :" << newton[0].inter.y
                   << std::endl;

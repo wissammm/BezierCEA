@@ -22,14 +22,13 @@ bool touchHull(Curve bez, Segment seg) {
 }
 
 double newtonMethod(Curve bez, double guessT, Segment seg, double epsilon) {
-    bez = changeOrigin(bez, seg.a);
-    seg.b     = seg.b - seg.a;
-    seg.a  =  Coord({0.0,0.0});
+    bez                 = changeOrigin(bez, seg.a);
+    seg.b               = seg.b - seg.a;
+    seg.a               = Coord({0.0, 0.0});
     Curve  deriv        = derivate(bez);
     Buffer bufferCurve  = createBuffer(bez.degree);
     Buffer bufferDerive = createBuffer(bez.degree - 1);
 
-    
     double dy = seg.b.y / distance(seg);
     double dx = seg.b.x / distance(seg);
     double u;
@@ -71,10 +70,10 @@ std::vector<Intersection> intersectionNaive(Curve bez, Segment seg, size_t nbPoi
 
         if (doIntersect(seg.a, points[i], seg.b, points[i + 1])) {
 
-            auto point = intersect(seg.a, seg.b, points[i], points[i + 1]);
-            
-            if (isOnBothSegments(point, seg.a, seg.b, points[i], points[i + 1])) {
-                
+            auto point = intersect(seg.a, points[i], seg.b, points[i + 1]);
+
+            if (onSegment(point, points[i], points[i + 1])) {
+
                 guesses.push_back(Intersection({point, static_cast<double>(i) / static_cast<double>(nbPoints)}));
             }
         }

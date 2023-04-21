@@ -14,9 +14,9 @@ double proj(Coord a, Coord b) { return dot(a, b) / abs(b); }
 
 Coord intersect(Segment seg1, Segment seg2) { return intersect(seg1.a, seg2.a, seg1.b, seg2.b); }
 
-double cross(Coord a, Coord b) { return a.x * b.y - a.y * b.x; }
-
 Coord intersect(Coord a1, Coord d1, Coord a2, Coord d2) { return a1 + cross(a2 - a1, d2) / cross(d1, d2) * d1; }
+
+double cross(Coord a, Coord b) { return a.x * b.y - a.y * b.x; }
 
 double angle(Coord a, Coord b) { return acos(dot(a, b) / abs(a) / abs(b)); }
 
@@ -33,7 +33,7 @@ double determinant(Coord a1, Coord a2, Coord b1, Coord b2) {
 bool onSegment(Coord p, Coord q, Coord r) {
     if (q.x - DELTA <= std::max(p.x, r.x) && q.x + DELTA >= std::min(p.x, r.x) && q.y - DELTA <= std::max(p.y, r.y) &&
         q.y + DELTA >= std::min(p.y, r.y)) {
-        
+
         return true;
     }
 
