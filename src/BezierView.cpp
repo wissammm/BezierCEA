@@ -1,12 +1,11 @@
 #include "Bezier/Bezier.h"
 #include "IO/Dump.h"
 #include "View/View.h"
-#include <chrono>
 #include <vector>
 #include <string>
 #include <ctime>
-#include <array>
-#include <filesystem>
+
+
 
 std::filesystem::path getResultPath() { return std::filesystem::u8path(RESULT_DIR); }
 

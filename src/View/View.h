@@ -8,8 +8,7 @@
 #include <vector>
 #include <random>
 
-
-using Curves= std::vector<CurveDraw>;
+using CurvesDraw = std::vector<CurveDraw>;
 
 struct View
 {
@@ -18,18 +17,13 @@ struct View
     Color         color = Color(0, 255, 255);
     SDL_Window*   window;
     SDL_Renderer* renderer;
-    Curves curves;
-
-
+    CurvesDraw    curves;
 
     void drawLine(Segment segment);
     void drawLines(Segments lines);
     void changeColor(int r, int g, int b);
     void drawLines(std::vector<Coord> points);
-    
 
   private:
     int menuCLI();
-
-    
 };

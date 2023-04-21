@@ -38,8 +38,7 @@ struct CurveNormalsAndTangents
     Segments           normals;
     Segments           tangents;
 };
-
-Curve                   translatePointsToP(Curve bez, Coord p);
+Curve changeOrigin(Curve curve , Coord p);
 Curve                   elevate(const Curve& curve);
 Curve                   derivate(const Curve& curve);
 Curve                   lower(const Curve& curve);

@@ -9,6 +9,14 @@ int binomial(int n, int k) {
 
 double bernstein(int m, int i, double u) { return binomial(m, i) * pow(u, i) * pow((1 - u), m - i); }
 
+Curve changeOrigin(Curve curve , Coord p){
+    
+    for(Coord & point : curve.controlPoint ){
+        point = point - p;
+    }
+    return curve;
+
+}
 
 Buffer createBuffer(size_t degree) {
     Buffer buffer(degree + 1);

@@ -14,6 +14,9 @@ Coord computeNormal(Coord tengent) {
     return Coord({-tengent.y / m, tengent.x / m});
 }
 
+
+
+
 Coord operator-(const Coord& coord) { return {-coord.x, -coord.y}; }
 Coord operator+(const Coord& coord1, const Coord& coord2) { return {coord1.x + coord2.x, coord1.y + coord2.y}; }
 Coord operator-(const Coord& coord1, const Coord& coord2) { return {coord1.x - coord2.x, coord1.y - coord2.y}; }

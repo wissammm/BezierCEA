@@ -22,20 +22,21 @@ bool touchHull(Curve bez, Segment seg) {
 }
 
 double newtonMethod(Curve bez, double guessT, Segment seg, double epsilon) {
-
+    bez = changeOrigin(bez, seg.a);
+    seg.b     = seg.b - seg.a;
+    seg.a  =  Coord({0.0,0.0});
     Curve  deriv        = derivate(bez);
     Buffer bufferCurve  = createBuffer(bez.degree);
     Buffer bufferDerive = createBuffer(bez.degree - 1);
 
-    translatePointsToP(bez, seg.a);
-    seg.b     = seg.b - seg.a;
+    
     double dy = seg.b.y / distance(seg);
     double dx = seg.b.x / distance(seg);
     double u;
 
     Coord  Cu, CuPrim;
     double Fu, FuPrim;
-    int cpt = 0;
+    int    cpt = 0;
     do {
         Cu     = evalCasteljau(bez, guessT, bufferCurve);
         CuPrim = evalCasteljau(deriv, guessT, bufferDerive);
@@ -55,8 +56,8 @@ std::vector<Intersection> intersectionNewtonMethod(Curve bez, Segment seg, doubl
     auto                      guessesNaive = intersectionNaive(bez, seg, 1000);
     std::vector<Intersection> guessesNewton;
     for (const Intersection& inter : guessesNaive) {
-        
-        double newton = newtonMethod(bez, inter.timeOnCurve, seg, epsilon);
+
+        double newton = newtonMethod(bez, inter.time, seg, epsilon);
         guessesNewton.push_back({evalCasteljau(bez, newton, bufferCurve), newton});
     }
     return guessesNewton;
@@ -67,14 +68,13 @@ std::vector<Intersection> intersectionNaive(Curve bez, Segment seg, size_t nbPoi
     std::vector<Intersection> guesses;
     auto                      points = casteljau(bez, nbPoints);
     for (int i = 0; i < points.size() - 1; ++i) {
-        
-        if (doIntersect(seg.a, seg.b, points[i], points[i + 1])) {
+
+        if (doIntersect(seg.a, points[i], seg.b, points[i + 1])) {
+
+            auto point = intersect(seg.a, seg.b, points[i], points[i + 1]);
             
-
-            auto point = getIntersectionPoint(seg.a, seg.b, points[i], points[i + 1]);
-            guesses.push_back(Intersection({point, static_cast<double>(i) / static_cast<double>(nbPoints)}));
             if (isOnBothSegments(point, seg.a, seg.b, points[i], points[i + 1])) {
-
+                
                 guesses.push_back(Intersection({point, static_cast<double>(i) / static_cast<double>(nbPoints)}));
             }
         }
