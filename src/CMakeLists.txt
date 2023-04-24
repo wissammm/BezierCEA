@@ -28,10 +28,10 @@ target_link_libraries (Bezier PUBLIC Geometry Eigen3::Eigen)
 # -----------------------
 # View
 # -----------------------
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
 
 find_package(SDL2 REQUIRED)
-# find_package(SDL2_gfx REQUIRED)
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+find_package(SDL2_gfx REQUIRED)
 
 add_library(View View/View.h View/View.cpp
                  View/Cli.h View/Cli.cpp
@@ -41,8 +41,8 @@ add_library(View View/View.h View/View.cpp
                  View/Color.h View/Color.cpp
             )
 target_include_directories(View PUBLIC ${SDL2_INCLUDE_DIRS}) 
-target_link_libraries (View PUBLIC Bezier ${SDL2_LIBRARIES})
-# target_link_libraries (View PUBLIC Bezier ${SDL2_LIBRARIES} SDL2_gfx)
+
+target_link_libraries (View PUBLIC Bezier ${SDL2_LIBRARIES} SDL2_gfx)
 target_include_directories(View PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
 # -----------------------
