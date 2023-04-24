@@ -41,9 +41,9 @@ double newtonMethod(Curve bez, double guessT, Segment seg, double epsilon) {
         CuPrim = evalCasteljau(deriv, guessT, bufferDerive);
 
         Fu     = dy * Cu.x - dx * Cu.y;
-        FuPrim = dy * CuPrim.x - dx * CuPrim.y;
+        FuPrim = dy * CuPrim.x - dx * CuPrim.y; 
         guessT = u;
-        u      = guessT - (Fu / FuPrim);
+        u      =(guessT - (Fu / FuPrim));
         cpt++;
     } while (std::abs(guessT - u) > epsilon);
     return u;
@@ -52,7 +52,7 @@ double newtonMethod(Curve bez, double guessT, Segment seg, double epsilon) {
 std::vector<Intersection> intersectionNewtonMethod(Curve bez, Segment seg, double epsilon) {
 
     Buffer                    bufferCurve  = createBuffer(bez.degree);
-    auto                      guessesNaive = intersectionNaive(bez, seg, 1000);
+    auto                      guessesNaive = intersectionNaive(bez, seg, 100);
     std::vector<Intersection> guessesNewton;
     for (const Intersection& inter : guessesNaive) {
 
@@ -68,16 +68,17 @@ std::vector<Intersection> intersectionNaive(Curve bez, Segment seg, size_t nbPoi
     auto                      points = casteljau(bez, nbPoints);
     for (int i = 0; i < points.size() - 1; ++i) {
 
-        if (doIntersect(seg.a, points[i], seg.b, points[i + 1])) {
+        //  if (doIntersect(seg.a, seg.b, points[i], points[i + 1])) {
+            printf("Do intersect \n ");
 
-            auto point = intersect(seg.a, points[i], seg.b, points[i + 1]);
+            auto point = lineLineIntersection(seg.a, seg.b, points[i], points[i + 1]);
 
-            if (onSegment(point, points[i], points[i + 1])) {
+            if (isOnBothSegments(point, seg.a, seg.b, points[i], points[i + 1])) {
 
                 guesses.push_back(Intersection({point, static_cast<double>(i) / static_cast<double>(nbPoints)}));
             }
         }
-    }
+    //  }
     return guesses;
 }
 

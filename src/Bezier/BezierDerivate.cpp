@@ -7,7 +7,7 @@ Curve derivate(const Curve& curve) {
     Curve retDeriv(curve.degree);
 
     for (size_t i = 1; i < retDeriv.nbControlPoint; i++) {
-        retDeriv.controlPoint[i - 1] = (curve.controlPoint[i - 1] - curve.controlPoint[i]) * static_cast<double>(curve.degree);
+        retDeriv.controlPoint[i - 1] =  static_cast<double>(curve.nbControlPoint) * (curve.controlPoint[i - 1] - curve.controlPoint[i]) ;
     }
     return retDeriv;
 }
