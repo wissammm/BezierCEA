@@ -4,32 +4,62 @@
 #include "View/CurveDraw.h"
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL2_gfxPrimitives.h>
 #include <string>
 #include <iostream>
 
 #define WIDTH  900
 #define HEIGHT 700
-using Selection = std::vector<std::string>;
 
-Selection menu_principal = Selection({
-    "0 : Quitter",
-    "1 : Créer courbe",
-});
+// Create custom split() function.
+std::vector<std::string> customSplit(std::string str, char separator) {
+    int                      startIndex = 0, endIndex = 0;
+    std::vector<std::string> strings;
+    for (int i = 0; i <= str.size(); i++) {
 
-int View::menuCLI() {
-
-    std::cout << "Menu" << std::endl;
-
-    printSelection(menu_principal);
-
-    size_t    choosen = inInt(static_cast<size_t>(menu_principal.size() + 1));
-   
-
-    if (choosen == 1) {
-        curves.push_back(createCurve());
+        // If we reached the end of the word or the end of the input.
+        if (str[i] == separator || i == str.size()) {
+            endIndex = i;
+            std::string temp;
+            temp.append(str, startIndex, endIndex - startIndex);
+            strings.push_back(temp);
+            startIndex = endIndex + 1;
+        }
     }
+    return strings;
+}
 
-    return EXIT_SUCCESS;
+void View::consoleCreator() {
+
+    std::string choice;
+    std::cin >> choice;
+    auto strings = customSplit(choice, ' ');
+    if (strings[0].compare("bezier") == 0) {
+        CurveDraw curveDraw;
+
+        if (strings[0].compare("-p") == 0) {
+            if (strings.size() % 2 == 0) {
+                Bezier bez = Bezier(strings.size() - 1);
+                for (int i = 2; i < strings.size(); i += 2) {
+                    bez.push_back(Coord({std::stod(strings[i]), std::stod(strings[i + 1])}));
+                }
+                curveDraw.bezier = Curve(bez);
+                curveDraw.points = casteljau(bez, pointsOnCurves);
+                curveDraw.name   = std::to_string(curves.size());
+                curves.push_back(curveDraw);
+            } else {
+                std::cout << "Nombres de points impair" << std::endl;
+            }
+
+        } else {
+            std::string nb   = strings[0];
+            Curve       bez  = randomPoint(std::stoi(nb), HEIGHT, WIDTH);
+            curveDraw.bezier = Curve(bez);
+            curveDraw.points = casteljau(bez, pointsOnCurves);
+            curveDraw.name   = std::to_string(curves.size());
+            curves.push_back(curveDraw);
+        }
+    }
 }
 
 int View::createWindow() {
@@ -69,32 +99,23 @@ int View::createWindow() {
         if (e.type == SDL_QUIT) {
             quit = true;
         }
-
+        consoleCreator();
         // Initialize renderer color white for the background
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
-
-        // Clear screen
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0xFF, 0xFF);
         SDL_RenderClear(renderer);
 
-        color.changeColor(1, 1, 1);
-
-        // Update screen
-        SDL_RenderPresent(renderer);
-
-        int signal = menuCLI();
-
-        for (size_t i = 0; i < curves.size(); ++i) {
-            color = curves[i].c;
+        for (int i = 0; i < curves.size(); ++i) {
             drawLines(curves[i].points);
         }
+        SDL_RenderPresent(renderer);
+        SDL_Delay(10);
     }
     return 0;
 }
 
 void View::drawLine(Segment segment) {
 
-    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 0);
-    SDL_RenderDrawLine(renderer, segment.a.x, segment.a.y, segment.b.x, segment.b.y);
+    thickLineRGBA(renderer, segment.a.x, segment.a.y, segment.b.x, segment.b.y, 3, color.r, color.g, color.b, 1);
 
     // Update screen
     SDL_RenderPresent(renderer);

@@ -18,11 +18,13 @@ struct View
     SDL_Window*   window;
     SDL_Renderer* renderer;
     CurvesDraw    curves;
+    size_t pointsOnCurves= 70;
 
     void drawLine(Segment segment);
     void drawLines(Segments lines);
     void changeColor(int r, int g, int b);
     void drawLines(std::vector<Coord> points);
+    void consoleCreator();
 
   private:
     int menuCLI();

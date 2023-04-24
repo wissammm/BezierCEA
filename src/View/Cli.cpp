@@ -69,7 +69,7 @@ CurveDraw createCurve() {
         curveReturn.bezier = getPositions(nbPoint);
     else
         curveReturn.bezier = randomPoint(nbPoint, 600, 400);
-    curveReturn.id = ++id;
+    
     curveReturn.c.randomColor();
     curveReturn.points = casteljau(curveReturn.bezier,NB_POINTS_ON_CURVE);
     return curveReturn;
