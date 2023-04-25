@@ -52,8 +52,8 @@ void View::consoleCreator() {
             }
 
         } else {
-            std::string nb   = strings[0];
-            Curve       bez  = randomPoint(std::stoi(nb), HEIGHT, WIDTH);
+            // std::string nb   = strings[0];
+            Curve       bez  = randomPoint(8, HEIGHT, WIDTH);
             curveDraw.bezier = Curve(bez);
             curveDraw.points = casteljau(bez, pointsOnCurves);
             curveDraw.name   = std::to_string(curves.size());

@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <array>
 
-#define DELTA 0.1
+#define DELTA 0.00001
 
 double norm(Coord a) { return dot(a, a); }
 
@@ -105,7 +105,7 @@ bool doIntersect(Coord p1, Coord q1, Coord p2, Coord q2) {
 
 bool isOnBothSegments(Coord p, Coord a1, Coord a2, Coord b1, Coord b2) {
     if (onSegment(a1,p, a2) && onSegment(b1,p, b2)) {
-        printf("DEBUG: Is on segment \n");
+        printf("DEBUG: Is on Both segment \n");
         return true;
     }
     return false;

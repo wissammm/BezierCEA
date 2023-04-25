@@ -6,8 +6,9 @@ Curve derivate(const Curve& curve) {
     //: COMMENT: pas sur que ca marche ...
     Curve retDeriv(curve.degree);
 
-    for (size_t i = 1; i < retDeriv.nbControlPoint; i++) {
-        retDeriv.controlPoint[i - 1] =  static_cast<double>(curve.nbControlPoint) * (curve.controlPoint[i - 1] - curve.controlPoint[i]) ;
+    for (size_t i = 1; i < curve.nbControlPoint; i++) {
+        retDeriv.controlPoint[i - 1] =  static_cast<double>(curve.degree) *
+         (curve.controlPoint[i] - curve.controlPoint[i - 1] ) ;
     }
     return retDeriv;
 }

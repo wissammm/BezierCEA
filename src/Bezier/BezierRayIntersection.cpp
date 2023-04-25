@@ -22,6 +22,9 @@ bool touchHull(Curve bez, Segment seg) {
 }
 
 double newtonMethod(Curve bez, double guessT, Segment seg, double epsilon) {
+
+    //TMPORAIRE
+
     bez                 = changeOrigin(bez, seg.a);
     seg.b               = seg.b - seg.a;
     seg.a               = Coord({0.0, 0.0});
@@ -31,7 +34,7 @@ double newtonMethod(Curve bez, double guessT, Segment seg, double epsilon) {
 
     double dy = seg.b.y / distance(seg);
     double dx = seg.b.x / distance(seg);
-    double u;
+    double u  = guessT;
 
     Coord  Cu, CuPrim;
     double Fu, FuPrim;
@@ -41,9 +44,10 @@ double newtonMethod(Curve bez, double guessT, Segment seg, double epsilon) {
         CuPrim = evalCasteljau(deriv, guessT, bufferDerive);
 
         Fu     = dy * Cu.x - dx * Cu.y;
-        FuPrim = dy * CuPrim.x - dx * CuPrim.y; 
+        FuPrim = dy * CuPrim.x - dx * CuPrim.y;
         guessT = u;
-        u      =(guessT - (Fu / FuPrim));
+        u      = (guessT - (Fu / FuPrim));
+
         cpt++;
     } while (std::abs(guessT - u) > epsilon);
     return u;
@@ -52,7 +56,7 @@ double newtonMethod(Curve bez, double guessT, Segment seg, double epsilon) {
 std::vector<Intersection> intersectionNewtonMethod(Curve bez, Segment seg, double epsilon) {
 
     Buffer                    bufferCurve  = createBuffer(bez.degree);
-    auto                      guessesNaive = intersectionNaive(bez, seg, 100);
+    auto                      guessesNaive = intersectionNaive(bez, seg, 10);
     std::vector<Intersection> guessesNewton;
     for (const Intersection& inter : guessesNaive) {
 
@@ -67,18 +71,15 @@ std::vector<Intersection> intersectionNaive(Curve bez, Segment seg, size_t nbPoi
     std::vector<Intersection> guesses;
     auto                      points = casteljau(bez, nbPoints);
     for (int i = 0; i < points.size() - 1; ++i) {
+        // Rajouter la condition convex hull 
+        auto point = lineLineIntersection(seg.a, seg.b, points[i], points[i + 1]);
 
-        //  if (doIntersect(seg.a, seg.b, points[i], points[i + 1])) {
-            printf("Do intersect \n ");
+        if (isOnBothSegments(point, seg.a, seg.b, points[i], points[i + 1])) {
 
-            auto point = lineLineIntersection(seg.a, seg.b, points[i], points[i + 1]);
-
-            if (isOnBothSegments(point, seg.a, seg.b, points[i], points[i + 1])) {
-
-                guesses.push_back(Intersection({point, static_cast<double>(i) / static_cast<double>(nbPoints)}));
-            }
+            guesses.push_back(Intersection({point, static_cast<double>(i) / static_cast<double>(nbPoints)}));
         }
-    //  }
+    }
+
     return guesses;
 }
 
