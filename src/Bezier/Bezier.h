@@ -39,14 +39,6 @@ struct CurveNormalsAndTangents
     Segments           tangents;
 };
 Curve changeOrigin(Curve curve , Coord p);
-Curve                   elevate(const Curve& curve);
-Curve                   derivate(const Curve& curve);
-Curve                   lower(const Curve& curve);
-Coord                   computeTangent(Coord deriv_time_t);
-Coord                   computeNormal(Coord tengent);
-Coord                   evalCasteljau(const Bezier& bezier, double t, Buffer& buffer);
+
 Buffer                  createBuffer(size_t degree);
-std::vector<Coord>      casteljau(const Curve& Curve, size_t nb_points_on_curve);
-CurveNormalsAndTangents normalsAndTangents(const Curve& Curve, size_t nb_points_on_curve, double factor);
-std::array<Curve, 2>    decompose(const Curve& curve, double t);
 Curve                   randomPoint(int n, int y, int x);

@@ -21,9 +21,6 @@ bool touchHull(Curve bez, Segment seg) {
     return false;
 }
 
-double newtonMethod(Curve bez, double guessT, Segment seg, double epsilon) {
-
-    //TMPORAIRE
 
     bez                 = changeOrigin(bez, seg.a);
     seg.b               = seg.b - seg.a;
@@ -32,6 +29,7 @@ double newtonMethod(Curve bez, double guessT, Segment seg, double epsilon) {
     Buffer bufferCurve  = createBuffer(bez.degree);
     Buffer bufferDerive = createBuffer(bez.degree - 1);
 
+    //veceur directeur 
     double dy = seg.b.y / distance(seg);
     double dx = seg.b.x / distance(seg);
     double u  = guessT;
