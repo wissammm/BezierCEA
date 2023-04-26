@@ -1,4 +1,5 @@
 #include "Bezier/Bezier.h"
+#include "Bezier/BezierEvaluate.h"
 #include "Geometry/Coord.h"
 #include "CurveDraw.h"
 #include <SDL2/SDL.h>

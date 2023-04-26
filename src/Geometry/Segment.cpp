@@ -4,10 +4,15 @@
 #include <cmath>
 #include <stdio.h>
 #include <array>
-#include "BezierEvaluate.h"
+#include "Bezier/BezierEvaluate.h"
 #include "Geometry/Coord.h"
 #include "Geometry/Segment.h"
-0.00001
+
+#define DELTA 1e-9
+
+double norm(Coord a) { return dot(a, a); }
+
+double abs(Coord a) { return sqrt(norm(a)); }
 
 double proj(Coord a, Coord b) { return dot(a, b) / abs(b); }
 
@@ -102,7 +107,7 @@ bool doIntersect(Coord p1, Coord q1, Coord p2, Coord q2) {
 }
 
 bool isOnBothSegments(Coord p, Coord a1, Coord a2, Coord b1, Coord b2) {
-    if (onSegment(a1,p, a2) && onSegment(b1,p, b2)) {
+    if (onSegment(a1, p, a2) && onSegment(b1, p, b2)) {
         printf("DEBUG: Is on Both segment \n");
         return true;
     }

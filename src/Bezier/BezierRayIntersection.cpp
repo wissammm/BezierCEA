@@ -21,7 +21,7 @@ bool touchHull(Curve bez, Segment seg) {
     return false;
 }
 
-
+double newtonMethod(Curve bez, double guessT, Segment seg, double epsilon) {
     bez                 = changeOrigin(bez, seg.a);
     seg.b               = seg.b - seg.a;
     seg.a               = Coord({0.0, 0.0});
@@ -29,7 +29,7 @@ bool touchHull(Curve bez, Segment seg) {
     Buffer bufferCurve  = createBuffer(bez.degree);
     Buffer bufferDerive = createBuffer(bez.degree - 1);
 
-    //veceur directeur 
+    //veceur directeur
     double dy = seg.b.y / distance(seg);
     double dx = seg.b.x / distance(seg);
     double u  = guessT;
@@ -69,7 +69,7 @@ std::vector<Intersection> intersectionNaive(Curve bez, Segment seg, size_t nbPoi
     std::vector<Intersection> guesses;
     auto                      points = casteljau(bez, nbPoints);
     for (int i = 0; i < points.size() - 1; ++i) {
-        // Rajouter la condition convex hull 
+        // Rajouter la condition convex hull
         auto point = lineLineIntersection(seg.a, seg.b, points[i], points[i + 1]);
 
         if (isOnBothSegments(point, seg.a, seg.b, points[i], points[i + 1])) {

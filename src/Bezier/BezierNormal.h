@@ -1,5 +1,5 @@
 #pragma once
-#include "Coord.h"
+#include "Geometry/Coord.h"
 #include "Bezier.h"
 
 Coord                   computeNormal(Coord tengent);

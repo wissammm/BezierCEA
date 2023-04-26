@@ -1,5 +1,6 @@
 #include "View/View.h"
 #include "Bezier/Bezier.h"
+#include "Bezier/BezierEvaluate.h"
 #include "Cli.h"
 #include "View/CurveDraw.h"
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <cstdio>
 
 struct Coord
 {
@@ -8,8 +9,6 @@ struct Coord
     double y;
 };
 
-double norm(Coord a);
-double abs(Coord a);
 
 Coord operator-(const Coord& coord);
 Coord operator+(const Coord& coord1, const Coord& coord2);

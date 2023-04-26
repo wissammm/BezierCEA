@@ -1,5 +1,5 @@
 #include "Bezier.h"
-
+#include <cmath>
 
 int binomial(int n, int k) {
     if (k == 0 || k == n)

@@ -1,7 +1,9 @@
 #include "BezierNormal.h"
+#include "BezierDerivate.h"
 #include "BezierEvaluate.h"
 #include "Geometry/Coord.h"
 #include "Geometry/Segment.h"
+#include <cmath>
 
 Coord computeTangent(Coord deriv_time_t) {
     //: SOURCE: https://pomax.github.io/bezierinfo/#derivatives
