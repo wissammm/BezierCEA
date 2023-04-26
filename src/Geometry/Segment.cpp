@@ -4,12 +4,10 @@
 #include <cmath>
 #include <stdio.h>
 #include <array>
-
-#define DELTA 0.00001
-
-double norm(Coord a) { return dot(a, a); }
-
-double abs(Coord a) { return sqrt(norm(a)); }
+#include "BezierEvaluate.h"
+#include "Geometry/Coord.h"
+#include "Geometry/Segment.h"
+0.00001
 
 double proj(Coord a, Coord b) { return dot(a, b) / abs(b); }
 

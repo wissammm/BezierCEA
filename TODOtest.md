@@ -22,6 +22,9 @@
 # Derivate 
 * Pas d'idée pour l'instant 
 
+# Decompose 
+* Décomposer la courbe en A et B puis ecart type de la suite de A par rapport à B sur un temps t > 1 et inversement sur B avec T < 1  
+
 # BezierRayIntersection 
 **Naive et Newton** 
 * Intersection aux points 0 et N de la courbe

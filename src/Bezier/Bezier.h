@@ -3,10 +3,9 @@
 #include "Geometry/Coord.h"
 #include "Geometry/Segment.h"
 #include <vector>
-#include <Eigen/Dense>
 
 using Bezier = std::vector<Coord>;
-using Eigen::MatrixXd;
+
 using Buffer   = std::vector<std::vector<Coord>>;
 using Segments = std::vector<Segment>;
 

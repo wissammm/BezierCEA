@@ -1,2 +1,8 @@
 #pragma once
-//TODO
+#include "Coord.h"
+
+struct Circle{
+    Coord center;
+    double radius; 
+};
+

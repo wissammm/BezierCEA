@@ -1,4 +1,6 @@
 #include "BezierElevate.h"
+#include <Eigen/Dense>
+using Eigen::MatrixXd;
 
 Curve elevate(const Curve& curve) {
     Curve retElevate(curve.nbControlPoint + 1);
