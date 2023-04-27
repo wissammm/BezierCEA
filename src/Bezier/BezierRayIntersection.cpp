@@ -69,10 +69,12 @@ std::vector<Intersection> intersectionNaive(Curve bez, Segment seg, size_t nbPoi
     std::vector<Intersection> guesses;
     auto                      points = casteljau(bez, nbPoints);
     for (int i = 0; i < points.size() - 1; ++i) {
-        // Rajouter la condition convex hull
+        // Vraiment CRACRA TODO, changer ça
+
         auto point = lineLineIntersection(seg.a, seg.b, points[i], points[i + 1]);
 
-        if (isOnBothSegments(point, seg.a, seg.b, points[i], points[i + 1])) {
+        if (isOnBothSegments(point, seg.a, seg.b, points[i], points[i + 1]) && points[i].x != __DBL_MAX__ &&
+            points[i].y != __DBL_MAX__) {
 
             guesses.push_back(Intersection({point, static_cast<double>(i) / static_cast<double>(nbPoints)}));
         }

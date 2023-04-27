@@ -1,9 +1,19 @@
 
 
+project(basic_test)
 
-include(FetchContent)
+################################
+# GTest
+################################
 
-FetchContent_Declare(
-  googletest
-  URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
-)
+enable_testing()
+include_directories(../src/${CMAKE_CURRENT_LIST_DIR} ${gtest_SOURCE_DIR})
+
+################################
+# Unit Tests
+################################
+# Add test cpp file
+add_executable( runUnitTests testRayIntersection.cpp )
+# Link test executable against gtest & gtest_main
+target_link_libraries(runUnitTests gtest gtest_main Bezier Geometry)
+add_test( runUnitTests runUnitTests )

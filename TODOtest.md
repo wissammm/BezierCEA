@@ -27,10 +27,10 @@
 
 # BezierRayIntersection 
 **Naive et Newton** 
-* Intersection aux points 0 et N de la courbe
+* Intersection aux points 0 et N de la courbe OK
 * Intersection tangente/normale à 1 points 
 * Intersection extrémité du segment sur la courbe 
-* Bon nombre d'intersections 
+* Bon nombre d'intersections OK 
 
 **Newton**
 * Essayer de le faire diverger 

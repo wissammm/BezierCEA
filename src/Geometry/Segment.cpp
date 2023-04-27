@@ -108,7 +108,7 @@ bool doIntersect(Coord p1, Coord q1, Coord p2, Coord q2) {
 
 bool isOnBothSegments(Coord p, Coord a1, Coord a2, Coord b1, Coord b2) {
     if (onSegment(a1, p, a2) && onSegment(b1, p, b2)) {
-        printf("DEBUG: Is on Both segment \n");
+        
         return true;
     }
     return false;

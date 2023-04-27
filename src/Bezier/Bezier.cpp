@@ -1,4 +1,6 @@
 #include "Bezier.h"
+#include "Geometry/Segment.h"
+#include <iostream>
 #include <cmath>
 
 int binomial(int n, int k) {
@@ -9,13 +11,12 @@ int binomial(int n, int k) {
 
 double bernstein(int m, int i, double u) { return binomial(m, i) * pow(u, i) * pow((1 - u), m - i); }
 
-Curve changeOrigin(Curve curve , Coord p){
-    
-    for(Coord & point : curve.controlPoint ){
+Curve changeOrigin(Curve curve, Coord p) {
+
+    for (Coord& point : curve.controlPoint) {
         point = point - p;
     }
     return curve;
-
 }
 
 Buffer createBuffer(size_t degree) {
@@ -28,9 +29,12 @@ Buffer createBuffer(size_t degree) {
 
 Curve randomPoint(int n, int y, int x) {
     Curve random_points = Curve(n);
-    for (int i = 0; i < n; i++) {
 
-        random_points.controlPoint.push_back(Coord({static_cast<double>(rand() % x), static_cast<double>(rand() % y)}));
+    for (int i = 0; i < n; i++) {
+        Coord point = Coord({static_cast<double>(rand() % x), static_cast<double>(rand() % y)});
+        // std::cout << " Point On Curve  \n x: " << point.x << " y :" << point.y << std::endl;
+
+        random_points.controlPoint[i] = point;
     }
     return random_points;
 }
