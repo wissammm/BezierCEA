@@ -3,10 +3,35 @@
 #include "Geometry/Coord.h"
 #include "Geometry/Segment.h"
 #include "Bezier/Bezier.h"
+#include <optional>
 
 enum OPTIONS{
     NAIVE,
     NEWTON,
+};
+
+
+struct NewtonForBezier
+{
+  public:
+    double  u;
+    Curve   curve;
+    Segment axe;
+    double  dx, dy;
+    Curve   deriv;
+    Coord   Cu, CuPrim;
+    Buffer  bufferCurve;
+    Buffer  bufferDerive;
+
+    NewtonForBezier(double guess, Curve bez, Segment seg);
+
+    // std::optional<double> computeNewton();
+
+    double d(double prevU);
+    double df(double prevU);
+
+  private:
+    void computeVariables();
 };
 
 struct Intersection{

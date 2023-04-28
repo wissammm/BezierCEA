@@ -3,4 +3,4 @@
 
 
 template<typename F, typename DF>
-std::optional<double> newton(F f, DF df, double firstGuess);
+std::optional<double> newton(F f, DF df, double &guess);

@@ -3,6 +3,8 @@
 #include "BezierEvaluate.h"
 #include "BezierDerivate.h"
 #include "BezierDecompose.h"
+#include "Geometry/Newton.h"
+#include <optional>
 #include <algorithm>
 #include <math.h>
 
@@ -20,6 +22,49 @@ bool touchHull(Curve bez, Segment seg) {
     }
     return false;
 }
+
+NewtonForBezier::NewtonForBezier(double guess, Curve bez, Segment seg) {
+    u     = guess;
+    curve = bez;
+    axe   = seg;
+
+    curve = changeOrigin(bez, seg.a);
+
+    axe.b        = axe.b - axe.a;
+    axe.a        = Coord({0.0, 0.0});
+    deriv        = derivate(curve);
+    bufferCurve  = createBuffer(curve.degree);
+    bufferDerive = createBuffer(curve.degree - 1);
+
+    //veceur directeur
+    dy = axe.b.y / distance(axe);
+    dx = axe.b.x / distance(axe);
+};
+
+std::optional<double> NewtonForBezier::computeNewton() {
+    const auto f = [&]() { return this->d(); };
+    std::optional<double> newtonResult = newton(this->d, this->df, u);
+    return newtonResult;
+}
+
+double NewtonForBezier::d(double prevU) {
+    u = prevU;
+    computeVariables();
+    double Fu;
+    Fu = dy * Cu.x - dx * Cu.y;
+    return Fu;
+};
+
+double NewtonForBezier::df(double prevU) {
+    double FuPrim;
+    FuPrim = dy * CuPrim.x - dx * CuPrim.y;
+    return FuPrim;
+};
+
+void NewtonForBezier::computeVariables() {
+    Cu     = evalCasteljau(curve, u, bufferCurve);
+    CuPrim = evalCasteljau(deriv, u, bufferDerive);
+};
 
 double newtonMethod(Curve bez, double guessT, Segment seg, double epsilon) {
     bez                 = changeOrigin(bez, seg.a);
