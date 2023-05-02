@@ -5,7 +5,7 @@
 add_library(Geometry 
             Geometry/Coord.h Geometry/Coord.cpp 
             Geometry/Segment.h Geometry/Segment.cpp
-            Geometry/Newton.h Geometry/Newton.cpp)
+            Geometry/Newton.h)
 target_include_directories(Geometry PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
 # -----------------------

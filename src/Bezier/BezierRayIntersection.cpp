@@ -77,23 +77,21 @@ double newtonMethod(Curve bez, double guessT, Segment seg, double epsilon) {
     //veceur directeur
     double dy = seg.b.y / distance(seg);
     double dx = seg.b.x / distance(seg);
-    double u  = guessT;
 
-    Coord  Cu, CuPrim;
-    double Fu, FuPrim;
-    int    cpt = 0;
-    do {
-        Cu     = evalCasteljau(bez, guessT, bufferCurve);
-        CuPrim = evalCasteljau(deriv, guessT, bufferDerive);
+    const auto f = [&](double u) {
+        Coord Cu = evalCasteljau(bez, u, bufferCurve);
+        return dy * Cu.x - dx * Cu.y;
+    };
+    const auto df = [&](double u) {
+        Coord CuPrim = evalCasteljau(deriv, u, bufferDerive);
+        return dy * CuPrim.x - dx * CuPrim.y;
+    };
+    const auto result = newton(f, df, guessT, epsilon, 1000000);
 
-        Fu     = dy * Cu.x - dx * Cu.y;
-        FuPrim = dy * CuPrim.x - dx * CuPrim.y;
-        guessT = u;
-        u      = (guessT - (Fu / FuPrim));
-
-        cpt++;
-    } while (std::abs(guessT - u) > epsilon);
-    return u;
+    if (result)
+        return *result;
+    else
+        return guessT;
 }
 
 std::vector<Intersection> intersectionNewtonMethod(Curve bez, Segment seg, double epsilon) {
