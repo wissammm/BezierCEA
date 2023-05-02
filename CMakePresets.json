@@ -8,6 +8,9 @@
         "value": "x64"
       },
       "binaryDir": "build",
+      "cacheVariables": {
+        "CMAKE_PREFIX_PATH": "${sourceDir}/build"
+      },
       "condition": {
         "type": "equals",
         "lhs": "${hostSystemName}",

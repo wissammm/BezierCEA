@@ -110,6 +110,7 @@ std::vector<Intersection> intersectionNewtonMethod(Curve bez, Segment seg, doubl
 }
 
 std::vector<Intersection> intersectionNaive(Curve bez, Segment seg, size_t nbPoints) {
+    constexpr auto MAX_DOUBLE = std::numeric_limits<double>::max();
 
     std::vector<Intersection> guesses;
     auto                      points = casteljau(bez, nbPoints);
@@ -118,8 +119,8 @@ std::vector<Intersection> intersectionNaive(Curve bez, Segment seg, size_t nbPoi
 
         auto point = lineLineIntersection(seg.a, seg.b, points[i], points[i + 1]);
 
-        if (isOnBothSegments(point, seg.a, seg.b, points[i], points[i + 1]) && points[i].x != __DBL_MAX__ &&
-            points[i].y != __DBL_MAX__) {
+        if (isOnBothSegments(point, seg.a, seg.b, points[i], points[i + 1]) && points[i].x != MAX_DOUBLE &&
+            points[i].y != MAX_DOUBLE) {
 
             guesses.push_back(Intersection({point, static_cast<double>(i) / static_cast<double>(nbPoints)}));
         }

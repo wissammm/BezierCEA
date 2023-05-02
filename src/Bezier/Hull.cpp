@@ -9,10 +9,10 @@
 
 std::vector<Coord> simpleHull(Curve curve) {
     std::vector<Coord> hull = std::vector<Coord>(4);
-    double             xmax = __DBL_MIN__;
-    double             xmin = __DBL_MAX__;
-    double             ymax = __DBL_MIN__;
-    double             ymin = __DBL_MAX__;
+    double             xmax = -std::numeric_limits<double>::infinity();
+    double             xmin = std::numeric_limits<double>::infinity();
+    double             ymax = -std::numeric_limits<double>::infinity();
+    double             ymin = std::numeric_limits<double>::infinity();
     for (size_t i = 0; i < curve.nbControlPoint; ++i) {
         if (curve.controlPoint[i].x < xmin) {
             xmin = curve.controlPoint[i].x;
@@ -49,8 +49,8 @@ std::vector<Coord> convexHull(Curve curve) {
 
     double u = guessT;
     //xmax
-    auto xminFirst  = __DBL_MAX__;
-    auto xminSecond = __DBL_MAX__;
+    auto xminFirst  = std::numeric_limits<double>::max();
+    auto xminSecond = std::numeric_limits<double>::max();
 
     do {
         C =  evalCasteljau(curve, guessT, buffer);

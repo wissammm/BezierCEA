@@ -17,6 +17,8 @@ double abs(Coord a) { return sqrt(norm(a)); }
 double proj(Coord a, Coord b) { return dot(a, b) / abs(b); }
 
 Coord lineLineIntersection(Coord A, Coord B, Coord C, Coord D) {
+    constexpr auto MAX_DOUBLE = std::numeric_limits<double>::max();
+
     // Line AB represented as a1x + b1y = c1
     double a1 = B.y - A.y;
     double b1 = A.x - B.x;
@@ -33,7 +35,7 @@ Coord lineLineIntersection(Coord A, Coord B, Coord C, Coord D) {
         // The lines are parallel. This is simplified
         // by returning a pair of FLT_MAX
         std::cerr << "SEGMENTS PARALLELES, OBJET NULL" << std::endl;
-        return Coord({__DBL_MAX__, __DBL_MAX__});
+        return Coord({MAX_DOUBLE, MAX_DOUBLE});
     } else {
         double x = (b2 * c1 - b1 * c2) / det;
         double y = (a1 * c2 - a2 * c1) / det;
