@@ -2,7 +2,7 @@
 #include "Bezier/BezierRayIntersection.h"
 #include "Bezier/BezierEvaluate.h"
 #include "IO/Dump.h"
-// #include "IO/Dump.h"
+#include "Bezier/Hull.h"
 #include <chrono>
 #include <vector>
 #include <string>
@@ -39,10 +39,11 @@ int main(int, char**) {
     {
         auto    timer = Timer{"test timer: "};
         Curve   bez   = Curve(Bezier({
-            Coord({1.0, 7.0}),
+            Coord({0.0, 1.0}),
+            Coord({-1.0, -1.0}),
+            Coord({-1.0, -2.0}),
             Coord({8.0, -12.0}),
-            Coord({11.0, -23.0}),
-            Coord({11.0, -24.0}),
+            Coord({7.0, -13.0}),
         }));
         Segment X     = Segment({Coord({-1000.0, 0.0}), Coord({1000.0, 0.0})});
         Segment A     = Segment({Coord({0.0, 0.0}), Coord({1.0, 1.0})});
@@ -50,6 +51,7 @@ int main(int, char**) {
         Segment B     = Segment({Coord({0.0, 1.0}), Coord({1.0, 0.0})});
 
 
+        std::vector<Coord> tmp = convexHull( bez);
 
         // // if (doIntersect(A.a, A.b, Aprim.a, Aprim.b)) { //DOINTERSECT ne marche pas 
         // //     std::cout << " A x B ; x= " << lineLineIntersection(Aprim, A).x

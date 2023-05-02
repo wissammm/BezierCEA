@@ -4,7 +4,8 @@
 
 add_library(Geometry 
             Geometry/Coord.h Geometry/Coord.cpp 
-            Geometry/Segment.h Geometry/Segment.cpp)
+            Geometry/Segment.h Geometry/Segment.cpp
+            Geometry/Newton.h Geometry/Newton.cpp)
 target_include_directories(Geometry PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
 # -----------------------
@@ -20,7 +21,8 @@ add_library(Bezier
             Bezier/BezierDerivate.h Bezier/BezierDerivate.cpp
             Bezier/BezierElevate.h Bezier/BezierElevate.cpp
             Bezier/BezierEvaluate.h Bezier/BezierEvaluate.cpp
-            Bezier/BezierRayIntersection.h Bezier/BezierRayIntersection.cpp)
+            Bezier/BezierRayIntersection.h Bezier/BezierRayIntersection.cpp
+            Bezier/Hull.h Bezier/Hull.cpp)
 
 target_include_directories(Bezier PUBLIC ${CMAKE_CURRENT_LIST_DIR}) 
 target_link_libraries (Bezier PUBLIC Geometry Eigen3::Eigen)

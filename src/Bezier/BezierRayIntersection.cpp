@@ -41,11 +41,11 @@ NewtonForBezier::NewtonForBezier(double guess, Curve bez, Segment seg) {
     dx = axe.b.x / distance(axe);
 };
 
-std::optional<double> NewtonForBezier::computeNewton() {
-    const auto f = [&]() { return this->d(); };
-    std::optional<double> newtonResult = newton(this->d, this->df, u);
-    return newtonResult;
-}
+// std::optional<double> NewtonForBezier::computeNewton() {
+//     const auto f = [&]() { return this->d(); };
+//     std::optional<double> newtonResult = newton(this->d, this->df, u);
+//     return newtonResult;
+// }
 
 double NewtonForBezier::d(double prevU) {
     u = prevU;
