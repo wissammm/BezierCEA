@@ -13,6 +13,12 @@ struct CoordTime
     double time;
 };
 
+struct Root
+{
+    double time;
+    bool isYaxis;
+};
+
 struct Bezier
 {
   public:
@@ -21,6 +27,7 @@ struct Bezier
     size_t             degree;
 
     std::vector<CoordTime> lut;
+    std::vector<Root> roots;
 
     Bezier(size_t n) {
         controlPoint   = std::vector<Coord>(n);
@@ -35,6 +42,8 @@ struct Bezier
 
     // Curve();
     Bezier() = default;
+
+    
 };
 using Beziers = std::vector<Bezier>;
 

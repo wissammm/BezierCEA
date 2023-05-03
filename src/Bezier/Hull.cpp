@@ -34,16 +34,17 @@ std::vector<Coord> simpleHull(Bezier curve) {
     return hull;
 }
 
-double findExtremum(Bezier  derivateFirst,
-                    Bezier  derivateSecond,
-                    double firstGuess,
-                    char   axis,
-                    Buffer first,
-                    Buffer second,
-                    double epsilon,
-                    double minRange,
-                    double maxRange) {
-    std::optional<double>  result;
+std::optional<double> findExtremum(Bezier derivateFirst,
+                                   Bezier derivateSecond,
+                                   double firstGuess,
+                                   char   axis,
+                                   Buffer first,
+                                   Buffer second,
+                                   double epsilon,
+                                   double minRange,
+                                   double maxRange,
+                                   double learningRate) {
+    std::optional<double> result;
 
     if (axis == 'x') {
         const auto f = [&](double u) {
@@ -67,48 +68,61 @@ double findExtremum(Bezier  derivateFirst,
         result = newton(f, df, firstGuess, epsilon, 100);
     }
 
-    if (result)
-        return *result;
-    else
-        return firstGuess;
+    return result;
 }
 
-std::vector<Coord> convexHull(Bezier curve) {
+std::vector<Root> rootsFromLUT(Bezier curve, std::vector<CoordTime> lut) {
+    std::vector<Root> roots;
+
     double epsilon     = 0.005;
-    Bezier  derivFirst  = derivate(curve);
+    Bezier derivFirst  = derivate(curve);
     auto   derivSecond = derivate(derivFirst);
 
-    Buffer buffer            = createBuffer(curve.degree);
     Buffer bufferDerivFirst  = createBuffer(derivFirst.degree);
     Buffer bufferDerivSecond = createBuffer(derivSecond.degree);
+    double tmp               = -1;
+    size_t cpt               = 0;
+    double rootY             = -1;
+    double rootX             = -1;
+    for (CoordTime l : lut) {
+        auto result = findExtremum(derivFirst, derivSecond, l.time, 'y', bufferDerivFirst, bufferDerivSecond);
+        if (result)
+            rootY = *result;
 
-    //Newton
-    double guessT = 0.5;
-    Coord  C, Cu, CuPrim;
-    double Fu, FuPrim;
-    int    cpt = 0;
+        if ((std::abs(rootY - tmp) > 0.00001) && (rootY >= 0 && rootY <= 1)) {
+            roots.push_back(Root({rootY, true}));
+            tmp = rootY;
+            cpt++;
+        }
+        // if (cpt >= curve.degree - 1)
+        //     break;
+    }
 
-    double u = guessT;
-    //xmax
-    auto xminFirst  = std::numeric_limits<double>::max();
-    auto xminSecond = std::numeric_limits<double>::max();
+    cpt = 0;
+    tmp = -1;
+    for (CoordTime l : lut) {
+        auto result = findExtremum(derivFirst, derivSecond, l.time, 'x', bufferDerivFirst, bufferDerivSecond);
+        if (result)
+            rootX = *result;
 
-    do {
-        C      = evalCasteljau(curve, guessT, buffer);
-        Cu     = evalCasteljau(derivFirst, guessT, bufferDerivFirst);
-        CuPrim = evalCasteljau(derivSecond, guessT, bufferDerivSecond);
+        if ((std::abs(rootX - tmp) > 0.00001) && (rootX >= 0 && rootX <= 1)) {
+            roots.push_back(Root({rootX, false}));
+            tmp = rootX;
+        }
+        // if (cpt >= curve.degree - 1)
+        //     break;
+    }
 
-        xminFirst  = std::min(xminFirst, Cu.x);
-        xminSecond = std::min(xminSecond, CuPrim.x);
+    return roots;
+}
 
-        // FuPrim = dy * CuPrim.x - dx * CuPrim.y;
-        guessT = u;
-        u      = (guessT - (xminFirst / xminSecond));
+std::vector<Coord> convexHull(Bezier& curve) {
 
-        cpt++;
-    } while (std::abs(guessT - u) > epsilon);
+    double nbPointsLUT = 2 * curve.degree; // comme la fréquence d'echantillonage
+    curve.lut          = computeLUT(curve, nbPointsLUT);
+    curve.roots        = rootsFromLUT(curve, curve.lut);
 
-    return std::vector<Coord>();
+    return std::vector<Coord>(1);
 }
 
 std::vector<Coord> minimumHull() { return std::vector<Coord>(); }

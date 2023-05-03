@@ -1,5 +1,5 @@
 #include "BezierEvaluate.h"
-#include <cmath> 
+#include <cmath>
 Coord evalCasteljau(const Bezier& curve, double t, Buffer& buffer) {
     //: SOURCE: https://fr.wikipedia.org/wiki/Algorithme_de_Casteljau
     const auto n = curve.degree;
@@ -31,8 +31,18 @@ std::vector<Coord> casteljau(const Bezier& curve, size_t nb_points_on_curve) {
     return curvePoints;
 }
 
-Coord getAFromBezier(Buffer buf){
-    return buf[buf.size()-3][2];
+Coord getAFromBezier(Buffer buf) { return buf[buf.size() - 3][2]; }
+
+std::vector<CoordTime> computeLUT(Bezier bez, size_t nbPointsLUT) {
+    std::vector<CoordTime> lut          = std::vector<CoordTime>(nbPointsLUT);
+    Buffer                 bufferBezier = createBuffer(bez.degree);
+
+
+    for (size_t i = 0; i < nbPointsLUT; i++) {
+        double time = static_cast<double>(i) / static_cast<double>(nbPointsLUT) * 1.;
+        lut[i] = CoordTime({evalCasteljau(bez, time, bufferBezier), time });
+    }
+    return lut;
 }
 
 // double ratio(double t, double n){

@@ -27,6 +27,7 @@ Buffer createBuffer(size_t degree) {
     return buffer;
 }
 
+
 Bezier randomPoint(int n, int y, int x) {
     Bezier random_points = Bezier(n);
 
