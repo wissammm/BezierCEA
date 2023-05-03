@@ -1,6 +1,6 @@
 #include "BezierEvaluate.h"
 #include <cmath> 
-Coord evalCasteljau(const Curve& curve, double t, Buffer& buffer) {
+Coord evalCasteljau(const Bezier& curve, double t, Buffer& buffer) {
     //: SOURCE: https://fr.wikipedia.org/wiki/Algorithme_de_Casteljau
     const auto n = curve.degree;
 
@@ -19,14 +19,14 @@ Coord evalCasteljau(const Curve& curve, double t, Buffer& buffer) {
     return buffer[n][0];
 }
 
-std::vector<Coord> casteljau(const Curve& curve, size_t nb_points_on_curve) {
-    Buffer bufferCurve = createBuffer(curve.degree);
+std::vector<Coord> casteljau(const Bezier& curve, size_t nb_points_on_curve) {
+    Buffer bufferBezier = createBuffer(curve.degree);
 
     auto curvePoints = std::vector<Coord>();
     curvePoints.reserve(nb_points_on_curve);
     for (size_t i = 0; i <= nb_points_on_curve; i++) {
         curvePoints.push_back(
-            evalCasteljau(curve, static_cast<double>(i) / static_cast<double>(nb_points_on_curve) * 1., bufferCurve));
+            evalCasteljau(curve, static_cast<double>(i) / static_cast<double>(nb_points_on_curve) * 1., bufferBezier));
     }
     return curvePoints;
 }

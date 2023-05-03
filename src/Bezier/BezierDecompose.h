@@ -6,4 +6,4 @@
 #include <array>
 
 
-std::array<Curve, 2> decompose(const Curve& curve, double t);
+std::array<Bezier, 2> decompose(const Bezier& curve, double t);

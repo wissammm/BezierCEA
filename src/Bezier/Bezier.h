@@ -4,40 +4,47 @@
 #include "Geometry/Segment.h"
 #include <vector>
 
-using Bezier = std::vector<Coord>;
-
 using Buffer   = std::vector<std::vector<Coord>>;
 using Segments = std::vector<Segment>;
 
-struct Curve
+struct CoordTime
+{
+    Coord  coord;
+    double time;
+};
+
+struct Bezier
 {
   public:
-    Bezier controlPoint;
-    size_t nbControlPoint;
-    size_t degree;
+    std::vector<Coord> controlPoint;
+    size_t             nbControlPoint;
+    size_t             degree;
 
-    Curve(size_t n) {
-        controlPoint   = Bezier(n);
+    std::vector<CoordTime> lut;
+
+    Bezier(size_t n) {
+        controlPoint   = std::vector<Coord>(n);
         nbControlPoint = n;
         degree         = nbControlPoint - 1;
     };
-    Curve(Bezier bezierControlPoint) {
+    Bezier(std::vector<Coord> bezierControlPoint) {
         controlPoint   = bezierControlPoint;
         nbControlPoint = controlPoint.size();
         degree         = nbControlPoint - 1;
     }
-    // Curve();
-    Curve() = default;
-};
-using Curves   = std::vector<Curve>;
 
-struct CurveNormalsAndTangents
+    // Curve();
+    Bezier() = default;
+};
+using Beziers = std::vector<Bezier>;
+
+struct BezierNormalsAndTangents
 {
     std::vector<Coord> curve;
     Segments           normals;
     Segments           tangents;
 };
-Curve changeOrigin(Curve curve , Coord p);
+Bezier changeOrigin(Bezier curve, Coord p);
 
-Buffer                  createBuffer(size_t degree);
-Curve                   randomPoint(int n, int y, int x);
+Buffer createBuffer(size_t degree);
+Bezier randomPoint(int n, int y, int x);

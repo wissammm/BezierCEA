@@ -5,42 +5,16 @@
 #include "Bezier/Bezier.h"
 #include <optional>
 
-enum OPTIONS{
+enum OPTIONS {
     NAIVE,
     NEWTON,
 };
 
-
-struct NewtonForBezier
-{
-  public:
-    double  u;
-    Curve   curve;
-    Segment axe;
-    double  dx, dy;
-    Curve   deriv;
-    Coord   Cu, CuPrim;
-    Buffer  bufferCurve;
-    Buffer  bufferDerive;
-
-    NewtonForBezier(double guess, Curve bez, Segment seg);
-
-    // std::optional<double> computeNewton();
-
-    double d(double prevU);
-    double df(double prevU);
-
-  private:
-    void computeVariables();
-};
-
-struct Intersection{
-    Coord inter;
-    double time;
-};
-
-bool touchHull(Curve bez, Segment seg);
-double newtonMethod(Curve bez, double guessT, Segment seg, double epsilon);
-std::vector<Intersection> intersectionNewtonMethod(Curve bez, Segment seg, double epsilon);
-std::vector<Intersection> intersectionNaive(Curve bez, Segment seg, size_t nbPoints);
-std::vector<Intersection> getAllIntersections(Segments segments, Curves curves, double epsilone, OPTIONS options);
+bool                   touchHull(Bezier bez, Segment seg);
+double                 newtonMethodIntersectionBezierRay(Bezier bez, double guessT, Segment seg, double epsilon);
+std::vector<CoordTime> intersectionNewtonMethod(Bezier  bez,
+                                                Segment seg,
+                                                double  epsilon         = 1e-9,
+                                                size_t  nbPointOnBezier = 100);
+std::vector<CoordTime> intersectionNaive(Bezier bez, Segment seg, size_t nbPoints);
+// std::vector<CoordTime> getAllCoordTimes(Segments segments, Beziers curves, double epsilone, OPTIONS options);

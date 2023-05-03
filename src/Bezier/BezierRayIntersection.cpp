@@ -13,65 +13,12 @@
 #include <cmath>
 using namespace std;
 
-bool touchHull(Curve bez, Segment seg) {
-    if (doIntersect(bez.controlPoint[0], bez.controlPoint[bez.degree], seg.a, seg.b))
-        return true;
-    for (int i = 0; i < bez.degree; ++i) {
-        if (doIntersect(bez.controlPoint[i], bez.controlPoint[i + 1], seg.a, seg.b))
-            return true;
-    }
-    return false;
-}
-
-NewtonForBezier::NewtonForBezier(double guess, Curve bez, Segment seg) {
-    u     = guess;
-    curve = bez;
-    axe   = seg;
-
-    curve = changeOrigin(bez, seg.a);
-
-    axe.b        = axe.b - axe.a;
-    axe.a        = Coord({0.0, 0.0});
-    deriv        = derivate(curve);
-    bufferCurve  = createBuffer(curve.degree);
-    bufferDerive = createBuffer(curve.degree - 1);
-
-    //veceur directeur
-    dy = axe.b.y / distance(axe);
-    dx = axe.b.x / distance(axe);
-};
-
-// std::optional<double> NewtonForBezier::computeNewton() {
-//     const auto f = [&]() { return this->d(); };
-//     std::optional<double> newtonResult = newton(this->d, this->df, u);
-//     return newtonResult;
-// }
-
-double NewtonForBezier::d(double prevU) {
-    u = prevU;
-    computeVariables();
-    double Fu;
-    Fu = dy * Cu.x - dx * Cu.y;
-    return Fu;
-};
-
-double NewtonForBezier::df(double prevU) {
-    double FuPrim;
-    FuPrim = dy * CuPrim.x - dx * CuPrim.y;
-    return FuPrim;
-};
-
-void NewtonForBezier::computeVariables() {
-    Cu     = evalCasteljau(curve, u, bufferCurve);
-    CuPrim = evalCasteljau(deriv, u, bufferDerive);
-};
-
-double newtonMethod(Curve bez, double guessT, Segment seg, double epsilon) {
+double newtonMethodIntersectionBezierRay(Bezier bez, double guessT, Segment seg, double epsilon) {
     bez                 = changeOrigin(bez, seg.a);
     seg.b               = seg.b - seg.a;
     seg.a               = Coord({0.0, 0.0});
-    Curve  deriv        = derivate(bez);
-    Buffer bufferCurve  = createBuffer(bez.degree);
+    Bezier deriv        = derivate(bez);
+    Buffer bufferBezier = createBuffer(bez.degree);
     Buffer bufferDerive = createBuffer(bez.degree - 1);
 
     //veceur directeur
@@ -79,7 +26,7 @@ double newtonMethod(Curve bez, double guessT, Segment seg, double epsilon) {
     double dx = seg.b.x / distance(seg);
 
     const auto f = [&](double u) {
-        Coord Cu = evalCasteljau(bez, u, bufferCurve);
+        Coord Cu = evalCasteljau(bez, u, bufferBezier);
         return dy * Cu.x - dx * Cu.y;
     };
     const auto df = [&](double u) {
@@ -94,24 +41,23 @@ double newtonMethod(Curve bez, double guessT, Segment seg, double epsilon) {
         return guessT;
 }
 
-std::vector<Intersection> intersectionNewtonMethod(Curve bez, Segment seg, double epsilon) {
+std::vector<CoordTime> intersectionNewtonMethod(Bezier bez, Segment seg, double epsilon, size_t nbPointOnBezier) {
 
-    Buffer                    bufferCurve  = createBuffer(bez.degree);
-    auto                      guessesNaive = intersectionNaive(bez, seg, 10);
-    std::vector<Intersection> guessesNewton;
-    for (const Intersection& inter : guessesNaive) {
-
-        double newton = newtonMethod(bez, inter.time, seg, epsilon);
-        guessesNewton.push_back({evalCasteljau(bez, newton, bufferCurve), newton});
+    Buffer                 bufferBezier = createBuffer(bez.degree);
+    auto                   guessesNaive = intersectionNaive(bez, seg, nbPointOnBezier);
+    std::vector<CoordTime> guessesNewton;
+    for (const CoordTime& inter : guessesNaive) {
+        double newton = newtonMethodIntersectionBezierRay(bez, inter.time, seg, epsilon);
+        guessesNewton.push_back({evalCasteljau(bez, newton, bufferBezier), newton});
     }
     return guessesNewton;
 }
 
-std::vector<Intersection> intersectionNaive(Curve bez, Segment seg, size_t nbPoints) {
+std::vector<CoordTime> intersectionNaive(Bezier bez, Segment seg, size_t nbPoints) {
     constexpr auto MAX_DOUBLE = std::numeric_limits<double>::max();
 
-    std::vector<Intersection> guesses;
-    auto                      points = casteljau(bez, nbPoints);
+    std::vector<CoordTime> guesses;
+    auto                   points = casteljau(bez, nbPoints);
     for (int i = 0; i < points.size() - 1; ++i) {
         // Vraiment CRACRA TODO, changer ça
 
@@ -120,13 +66,13 @@ std::vector<Intersection> intersectionNaive(Curve bez, Segment seg, size_t nbPoi
         if (isOnBothSegments(point, seg.a, seg.b, points[i], points[i + 1]) && points[i].x != MAX_DOUBLE &&
             points[i].y != MAX_DOUBLE) {
 
-            guesses.push_back(Intersection({point, static_cast<double>(i) / static_cast<double>(nbPoints)}));
+            guesses.push_back(CoordTime({point, static_cast<double>(i) / static_cast<double>(nbPoints)}));
         }
     }
 
     return guesses;
 }
 
-std::vector<Intersection> getAllIntersections(Segments segments, Curves curves, double epsilone, OPTIONS options) {
-    return std::vector<Intersection>();
-}
+// std::vector<CoordTime> getAllIntersections(Segments segments, Beziers curves, double epsilone, OPTIONS options) {
+//     return std::vector<CoordTime>();
+// }

@@ -11,7 +11,7 @@ int binomial(int n, int k) {
 
 double bernstein(int m, int i, double u) { return binomial(m, i) * pow(u, i) * pow((1 - u), m - i); }
 
-Curve changeOrigin(Curve curve, Coord p) {
+Bezier changeOrigin(Bezier curve, Coord p) {
 
     for (Coord& point : curve.controlPoint) {
         point = point - p;
@@ -27,12 +27,12 @@ Buffer createBuffer(size_t degree) {
     return buffer;
 }
 
-Curve randomPoint(int n, int y, int x) {
-    Curve random_points = Curve(n);
+Bezier randomPoint(int n, int y, int x) {
+    Bezier random_points = Bezier(n);
 
     for (int i = 0; i < n; i++) {
         Coord point = Coord({static_cast<double>(rand() % x), static_cast<double>(rand() % y)});
-        // std::cout << " Point On Curve  \n x: " << point.x << " y :" << point.y << std::endl;
+        // std::cout << " Point On Bezier  \n x: " << point.x << " y :" << point.y << std::endl;
 
         random_points.controlPoint[i] = point;
     }

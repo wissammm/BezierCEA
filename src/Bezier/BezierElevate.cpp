@@ -2,8 +2,8 @@
 #include <Eigen/Dense>
 using Eigen::MatrixXd;
 
-Curve elevate(const Curve& curve) {
-    Curve retElevate(curve.nbControlPoint + 1);
+Bezier elevate(const Bezier& curve) {
+    Bezier retElevate(curve.nbControlPoint + 1);
     retElevate.controlPoint[0] = curve.controlPoint[0];
 
     Coord tmpPoint;
@@ -16,11 +16,11 @@ Curve elevate(const Curve& curve) {
     return retElevate;
 }
 
-Curve lower(const Curve& curve) {
+Bezier lower(const Bezier& curve) {
 
     size_t k = curve.nbControlPoint;
     size_t n = k - 1;
-    Curve  retLower(n);
+    Bezier  retLower(n);
 
     if (k <= 3) {
         return curve;

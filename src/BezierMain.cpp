@@ -38,7 +38,7 @@ int main(int, char**) {
 
     {
         auto    timer = Timer{"test timer: "};
-        Curve   bez   = Curve(Bezier({
+        Bezier   bez   = Bezier(std::vector<Coord>({
             Coord({0.0, 1.0}),
             Coord({-1.0, -1.0}),
             Coord({-1.0, -2.0}),

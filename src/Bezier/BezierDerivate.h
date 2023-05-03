@@ -2,4 +2,4 @@
 #include "Bezier.h"
 
 
-Curve derivate(const Curve& curve);
+Bezier derivate(const Bezier& curve);
