@@ -9,22 +9,22 @@
 #include <optional>
 #include <cmath>
 
-std::vector<Coord> simpleHull(Bezier curve) {
+std::vector<Coord> minMaxFromPoints(std::vector<Coord> points) {
     std::vector<Coord> hull = std::vector<Coord>(4);
     double             xmax = -std::numeric_limits<double>::infinity();
     double             xmin = std::numeric_limits<double>::infinity();
     double             ymax = -std::numeric_limits<double>::infinity();
     double             ymin = std::numeric_limits<double>::infinity();
-    for (size_t i = 0; i < curve.nbControlPoint; ++i) {
-        if (curve.controlPoint[i].x < xmin) {
-            xmin = curve.controlPoint[i].x;
-        } else if (curve.controlPoint[i].x > xmax) {
-            xmax = curve.controlPoint[i].x;
+    for (size_t i = 0; i < points.size(); ++i) {
+        if (points[i].x < xmin) {
+            xmin = points[i].x;
+        } else if (points[i].x > xmax) {
+            xmax = points[i].x;
         }
-        if (curve.controlPoint[i].y < ymin) {
-            ymin = curve.controlPoint[i].y;
-        } else if (curve.controlPoint[i].y > ymax) {
-            ymax = curve.controlPoint[i].y;
+        if (points[i].y < ymin) {
+            ymin = points[i].y;
+        } else if (points[i].y > ymax) {
+            ymax = points[i].y;
         }
     }
     hull[0] = Coord({xmin, ymax});
@@ -121,8 +121,15 @@ std::vector<Coord> convexHull(Bezier& curve) {
     double nbPointsLUT = 2 * curve.degree; // comme la fréquence d'echantillonage
     curve.lut          = computeLUT(curve, nbPointsLUT);
     curve.roots        = rootsFromLUT(curve, curve.lut);
+    std::vector<Coord> points;
+    Buffer             buffer = createBuffer(curve.degree);
+    for (Root r : curve.roots) {
+        points.push_back(evalCasteljau(curve, r.time, buffer));
+    }
+    points.push_back(curve.lut[0].coord);
+    points.push_back(curve.lut[curve.lut.size() - 1].coord);
 
-    return std::vector<Coord>(1);
+    return minMaxFromPoints(points);
 }
 
 std::vector<Coord> minimumHull() { return std::vector<Coord>(); }
