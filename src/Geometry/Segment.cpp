@@ -4,6 +4,7 @@
 #include <cmath>
 #include <stdio.h>
 #include <array>
+#include <optional>
 #include "Bezier/BezierEvaluate.h"
 #include "Geometry/Coord.h"
 #include "Geometry/Segment.h"
@@ -16,8 +17,8 @@ double abs(Coord a) { return sqrt(norm(a)); }
 
 double proj(Coord a, Coord b) { return dot(a, b) / abs(b); }
 
-Coord lineLineIntersection(Coord A, Coord B, Coord C, Coord D) {
-    constexpr auto MAX_DOUBLE = std::numeric_limits<double>::max();
+std::optional<Coord> lineLineIntersection(Coord A, Coord B, Coord C, Coord D) {
+    // 
 
     // Line AB represented as a1x + b1y = c1
     double a1 = B.y - A.y;
@@ -35,7 +36,7 @@ Coord lineLineIntersection(Coord A, Coord B, Coord C, Coord D) {
         // The lines are parallel. This is simplified
         // by returning a pair of FLT_MAX
         std::cerr << "SEGMENTS PARALLELES, OBJET NULL" << std::endl;
-        return Coord({MAX_DOUBLE, MAX_DOUBLE});
+        return std::nullopt;
     } else {
         double x = (b2 * c1 - b1 * c2) / det;
         double y = (a1 * c2 - a2 * c1) / det;
@@ -57,7 +58,7 @@ double distance(Coord A, Coord B) { return sqrt(pow(B.x - A.x, 2) + pow(B.y - A.
 
 double determinant(double a1, double a2, double b1, double b2) { return a1 * b2 - a2 * b1; }
 
-Coord lineLineIntersection(Segment seg1, Segment seg2) { return lineLineIntersection(seg1.a, seg1.b, seg2.a, seg2.b); }
+std::optional<Coord> lineLineIntersection(Segment seg1, Segment seg2) { return lineLineIntersection(seg1.a, seg1.b, seg2.a, seg2.b); }
 
 bool onSegment(Coord p, Coord q, Coord r) {
     if (q.x - DELTA <= std::max(p.x, r.x) && q.x + DELTA >= std::min(p.x, r.x) && q.y - DELTA <= std::max(p.y, r.y) &&
@@ -79,6 +80,7 @@ int orientation(Coord p, Coord q, Coord r) {
 }
 
 bool doIntersect(Coord p1, Coord q1, Coord p2, Coord q2) {
+    std::cout << "DEBUG : Méthode ne marche pas" << std::endl;
     int o1 = orientation(p1, q1, p2);
     int o2 = orientation(p1, q1, q2);
     int o3 = orientation(p2, q2, p1);

@@ -60,13 +60,15 @@ std::vector<CoordTime> intersectionNaive(Bezier bez, Segment seg, size_t nbPoint
     auto                   points = casteljau(bez, nbPoints);
     for (int i = 0; i < points.size() - 1; ++i) {
         // Vraiment CRACRA TODO, changer ça
-
+        // TODO rajouter la hull 
         auto point = lineLineIntersection(seg.a, seg.b, points[i], points[i + 1]);
 
-        if (isOnBothSegments(point, seg.a, seg.b, points[i], points[i + 1]) && points[i].x != MAX_DOUBLE &&
-            points[i].y != MAX_DOUBLE) {
+        if (point) {
+            if (isOnBothSegments(*point, seg.a, seg.b, points[i], points[i + 1]) && points[i].x != MAX_DOUBLE &&
+                points[i].y != MAX_DOUBLE) {
 
-            guesses.push_back(CoordTime({point, static_cast<double>(i) / static_cast<double>(nbPoints)}));
+                guesses.push_back(CoordTime({*point, static_cast<double>(i) / static_cast<double>(nbPoints)}));
+            }
         }
     }
 

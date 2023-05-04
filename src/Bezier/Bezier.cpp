@@ -27,15 +27,14 @@ Buffer createBuffer(size_t degree) {
     return buffer;
 }
 
+Coord randomPoint(int x, int y) { return Coord({static_cast<double>(rand() % x), static_cast<double>(rand() % y)}); }
 
-Bezier randomPoint(int n, int y, int x) {
-    Bezier random_points = Bezier(n);
+std::vector<Coord> randomPoints(int n, int x, int y) {
+    std::vector<Coord> random_points;
 
     for (int i = 0; i < n; i++) {
-        Coord point = Coord({static_cast<double>(rand() % x), static_cast<double>(rand() % y)});
-        // std::cout << " Point On Bezier  \n x: " << point.x << " y :" << point.y << std::endl;
 
-        random_points.controlPoint[i] = point;
+        random_points.push_back(randomPoint(x, y));
     }
     return random_points;
 }

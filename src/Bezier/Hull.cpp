@@ -4,10 +4,41 @@
 #include "Bezier/BezierEvaluate.h"
 #include "Bezier/BezierDerivate.h"
 #include "Geometry/Coord.h"
+#include "Geometry/Segment.h"
 #include "Geometry/Newton.h"
 #include <vector>
 #include <optional>
 #include <cmath>
+
+bool isIntersectSegmentHull(std::vector<Coord> hull, Segment seg) {
+    auto intersect = lineLineIntersection(seg, Segment({hull[0], hull[hull.size() - 1]}));
+    if (intersect)
+        return true;
+    for (size_t i = 0; i < hull.size() - 1; ++i) {
+        intersect = lineLineIntersection(seg, Segment({hull[i], hull[i + 1]}));
+        if (intersect) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool isPointInHull(std::vector<Coord> hull, Coord point) {
+    constexpr auto MAX_DOUBLE = std::numeric_limits<double>::max();
+    Segment        seg        = Segment({point, Coord({MAX_DOUBLE - 1, MAX_DOUBLE - 1})}); //RAYON INFINI
+
+    size_t cpt       = 0;
+    auto   intersect = lineLineIntersection(seg, Segment({hull[0], hull[hull.size() - 1]}));
+    if (intersect)
+        cpt++;
+    for (size_t i = 0; i < hull.size() - 1; ++i) {
+        intersect = lineLineIntersection(seg, Segment({hull[i], hull[i + 1]}));
+        if (intersect) {
+            cpt++;
+        }
+    }
+    return !(cpt % 2);
+}
 
 std::vector<Coord> minMaxFromPoints(std::vector<Coord> points) {
     std::vector<Coord> hull = std::vector<Coord>(4);
