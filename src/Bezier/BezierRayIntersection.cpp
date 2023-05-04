@@ -33,7 +33,7 @@ double newtonMethodIntersectionBezierRay(Bezier bez, double guessT, Segment seg,
         Coord CuPrim = evalCasteljau(deriv, u, bufferDerive);
         return dy * CuPrim.x - dx * CuPrim.y;
     };
-    const auto result = newton(f, df, guessT, epsilon, 1000000);
+    const auto result = newton(f, df, guessT, { .epsilon = epsilon, .nMaxIterations = 1000000});
 
     if (result)
         return *result;

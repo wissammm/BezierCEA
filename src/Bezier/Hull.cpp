@@ -86,7 +86,7 @@ std::optional<double> findExtremum(Bezier derivateFirst,
             Coord CuPrim = evalCasteljau(derivateSecond, u, second);
             return CuPrim.x;
         };
-        result = newton(f, df, firstGuess, epsilon, 100);
+        result = newton(f, df, firstGuess, { .epsilon = epsilon, .nMaxIterations = 100 });
     } else if (axis == 'y') {
         const auto f = [&](double u) {
             Coord Cu = evalCasteljau(derivateFirst, u, first);
@@ -96,7 +96,7 @@ std::optional<double> findExtremum(Bezier derivateFirst,
             Coord CuPrim = evalCasteljau(derivateSecond, u, second);
             return CuPrim.y;
         };
-        result = newton(f, df, firstGuess, epsilon, 100);
+        result = newton(f, df, firstGuess, { .epsilon = epsilon, .nMaxIterations = 100 });
     }
 
     return result;

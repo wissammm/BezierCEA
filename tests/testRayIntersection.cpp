@@ -2,11 +2,11 @@
 
 #include <limits.h>
 #include <iostream>
-#include "../src/Bezier/Bezier.h"
-#include "../src/Geometry/Coord.h"
-#include "../src/Geometry/Segment.h"
-#include "../src/Bezier/BezierRayIntersection.h"
-#include "../src/Bezier/BezierEvaluate.h"
+#include "Bezier/Bezier.h"
+#include "Geometry/Coord.h"
+#include "Geometry/Segment.h"
+#include "Bezier/BezierRayIntersection.h"
+#include "Bezier/BezierEvaluate.h"
 #include "gtest/gtest.h"
 #include <cmath>
 #include <random>

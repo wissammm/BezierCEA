@@ -13,10 +13,6 @@ find_package(GTest REQUIRED)
 # Unit Tests
 ################################
 # Add test cpp file
-add_executable( runUnitTestsRayIntersection testRayIntersection.cpp  )
-
-# Link test executable against gtest & gtest_main
-target_link_libraries(runUnitTestsRayIntersection GTest::gtest GTest::gtest_main Bezier Geometry)
-add_test( runUnitTestsRayIntersection runUnitTestsRayIntersection )
-
-add_executable( runUnitTestsRootsHull testRootsAndHull.cpp  )
+add_executable( runTests testRayIntersection.cpp testRootsAndHull.cpp )
+target_link_libraries(runTests GTest::gtest GTest::gtest_main Bezier Geometry)
+add_test( runTests runTests )
