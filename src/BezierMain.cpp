@@ -74,14 +74,12 @@ int main(int, char**) {
         writeSegmentsVTK(segs,"BoundingbBox.vtk");
         writeLinesVTK(curve,"curve.vtk");
         writePointsVTK(bez.controlPoint,"control_points.vtk");
-        // for (Root r : bez.roots) {
-        //     if (r.isYaxis) {
-        //         std::cout << "Root y axis : time t =" << r.time << " x= " << evalCasteljau(bez, r.time, bezBuff).x
-        //                   << " y = " << evalCasteljau(bez, r.time, bezBuff).y << std::endl;
-        //     } else {
-        //         std::cout << "Root x axis : time t =" << r.time << " x= " << evalCasteljau(bez, r.time, bezBuff).x
-        //                   << " y = " << evalCasteljau(bez, r.time, bezBuff).y << std::endl;
-        //     }
-        // }
+        std::vector<Coord> roo;
+
+        for (int i = 0; i <bez.roots.size() ; i++) {
+            roo.push_back(evalCasteljau(bez,bez.roots[i].time,bezBuff));
+        }
+        writePointsVTK(roo,"roots.vtk");
+
     }
 }

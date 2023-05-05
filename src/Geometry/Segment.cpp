@@ -9,7 +9,7 @@
 #include "Geometry/Coord.h"
 #include "Geometry/Segment.h"
 
-#define DELTA 1e-9
+#define DELTA 0
 
 double norm(Coord a) { return dot(a, a); }
 

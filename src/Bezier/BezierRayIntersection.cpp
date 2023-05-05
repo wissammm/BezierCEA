@@ -46,6 +46,7 @@ std::vector<CoordTime> intersectionNewtonMethod(Bezier bez, Segment seg, double 
     Buffer                 bufferBezier = createBuffer(bez.degree);
     auto                   guessesNaive = intersectionNaive(bez, seg, nbPointOnBezier);
     std::vector<CoordTime> guessesNewton;
+    
     for (const CoordTime& inter : guessesNaive) {
         double newton = newtonMethodIntersectionBezierRay(bez, inter.time, seg, epsilon);
         guessesNewton.push_back({evalCasteljau(bez, newton, bufferBezier), newton});
@@ -64,14 +65,18 @@ std::vector<CoordTime> intersectionNaive(Bezier bez, Segment seg, size_t nbPoint
         auto point = lineLineIntersection(seg.a, seg.b, points[i], points[i + 1]);
 
         if (point) {
-            if (isOnBothSegments(*point, seg.a, seg.b, points[i], points[i + 1]) && points[i].x != MAX_DOUBLE &&
-                points[i].y != MAX_DOUBLE) {
+            if (isOnBothSegments(*point, seg.a, seg.b, points[i], points[i + 1]) ) {
 
                 guesses.push_back(CoordTime({*point, static_cast<double>(i) / static_cast<double>(nbPoints)}));
             }
+            if(distance(*point,points[i]) <= 0.0000000001){
+                double o = 0;
+            }
         }
     }
-
+    if(guesses.size()==0){
+        double o = 0;
+    }
     return guesses;
 }
 

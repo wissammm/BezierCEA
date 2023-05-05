@@ -93,11 +93,11 @@ TEST(RayIntersectionNaiveNewton, LikeABully) {
     std::uniform_real_distribution<> distribution(0, 1);
 
     for (uint_fast16_t i = 3; i < 5; i++) {
-        auto controlPoint = randomPoints(i, 256, 256);
-        Bezier curve = Bezier(controlPoint);
+        auto   controlPoint = randomPoints(i, 256, 256);
+        Bezier curve        = Bezier(controlPoint);
         for (uint_fast16_t j = 0; j < 128; ++j) {
-            auto    point             = randomPoint(256, 256);
-            
+            auto point = randomPoint(256, 256);
+
             double  t                  = distribution(generator);
             Buffer  buffer             = createBuffer(curve.nbControlPoint);
             Coord   on_curve           = evalCasteljau(curve, t, buffer);
@@ -105,7 +105,8 @@ TEST(RayIntersectionNaiveNewton, LikeABully) {
             auto    intersections      = intersectionNewtonMethod(curve, seg, 0.00000001);
             bool    one_good_intersect = false;
             for (size_t k = 0; k < intersections.size(); ++k) {
-                if (std::abs(intersections[i].time - t) < 0.1) {
+                double diff = t - intersections[k].time;
+                if (std::abs(diff) <= 0.001) {
                     one_good_intersect = true;
                 } else {
                     std::cout << "not a intersect " << std::endl;
