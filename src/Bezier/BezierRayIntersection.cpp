@@ -11,7 +11,7 @@
 #define TOLERANCE 0.1
 #include <iostream>
 #include <cmath>
-using namespace std;
+
 
 double newtonMethodIntersectionBezierRay(Bezier bez, double guessT, Segment seg, double epsilon) {
     bez                 = changeOrigin(bez, seg.a);

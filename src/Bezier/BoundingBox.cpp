@@ -1,4 +1,4 @@
-#include "Hull.h"
+#include "BoundingBox.h"
 
 #include "Bezier/Bezier.h"
 #include "Bezier/BezierEvaluate.h"
@@ -10,7 +10,8 @@
 #include <optional>
 #include <cmath>
 
-bool isIntersectSegmentHull(std::vector<Coord> hull, Segment seg) {
+
+bool isIntersectSegmentBoundingBox(std::vector<Coord> hull, Segment seg) {
     auto intersect = lineLineIntersection(seg, Segment({hull[0], hull[hull.size() - 1]}));
     if (intersect)
         return true;
@@ -23,7 +24,7 @@ bool isIntersectSegmentHull(std::vector<Coord> hull, Segment seg) {
     return false;
 }
 
-bool isPointInHull(std::vector<Coord> hull, Coord point) {
+bool isPointInBoundingBox(std::vector<Coord> hull, Coord point) {
     constexpr auto MAX_DOUBLE = std::numeric_limits<double>::max();
     Segment        seg        = Segment({point, Coord({MAX_DOUBLE - 1, MAX_DOUBLE - 1})}); //RAYON INFINI
 
@@ -71,10 +72,7 @@ std::optional<double> findExtremum(Bezier derivateFirst,
                                    char   axis,
                                    Buffer first,
                                    Buffer second,
-                                   double epsilon,
-                                   double minRange,
-                                   double maxRange,
-                                   double learningRate) {
+                                   const NewtonOptions& options) {
     std::optional<double> result;
 
     if (axis == 'x') {
@@ -86,7 +84,7 @@ std::optional<double> findExtremum(Bezier derivateFirst,
             Coord CuPrim = evalCasteljau(derivateSecond, u, second);
             return CuPrim.x;
         };
-        result = newton(f, df, firstGuess, { .epsilon = epsilon, .nMaxIterations = 100 });
+        result = newton(f, df, firstGuess, { .epsilon = 0.0001, .nMaxIterations = 100 });
     } else if (axis == 'y') {
         const auto f = [&](double u) {
             Coord Cu = evalCasteljau(derivateFirst, u, first);
@@ -96,7 +94,7 @@ std::optional<double> findExtremum(Bezier derivateFirst,
             Coord CuPrim = evalCasteljau(derivateSecond, u, second);
             return CuPrim.y;
         };
-        result = newton(f, df, firstGuess, { .epsilon = epsilon, .nMaxIterations = 100 });
+        result = newton(f, df, firstGuess, { .epsilon = 0.0001, .nMaxIterations = 100 });
     }
 
     return result;
@@ -147,7 +145,7 @@ std::vector<Root> rootsFromLUT(Bezier curve, std::vector<CoordTime> lut) {
     return roots;
 }
 
-std::vector<Coord> convexHull(Bezier& curve) {
+std::vector<Coord> convexBoundingBox(Bezier& curve) {
 
     double nbPointsLUT = 2 * curve.degree; // comme la fréquence d'echantillonage
     curve.lut          = computeLUT(curve, nbPointsLUT);
@@ -157,10 +155,10 @@ std::vector<Coord> convexHull(Bezier& curve) {
     for (Root r : curve.roots) {
         points.push_back(evalCasteljau(curve, r.time, buffer));
     }
-    points.push_back(curve.lut[0].coord);
-    points.push_back(curve.lut[curve.lut.size() - 1].coord);
+    points.push_back(curve.controlPoint[0]);
+    points.push_back(curve.controlPoint[curve.controlPoint.size() - 1]);
 
     return minMaxFromPoints(points);
 }
 
-std::vector<Coord> minimumHull() { return std::vector<Coord>(); }
+std::vector<Coord> minimumBoundingBox() { return std::vector<Coord>(); }

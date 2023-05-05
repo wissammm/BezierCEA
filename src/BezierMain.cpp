@@ -1,9 +1,9 @@
 #include "Bezier/Bezier.h"
 #include "Bezier/BezierRayIntersection.h"
 #include "Bezier/BezierEvaluate.h"
-#include "Bezier/Hull.h"
+#include "Bezier/BoundingBox.h"
 #include "IO/Dump.h"
-#include "Bezier/Hull.h"
+
 #include <chrono>
 #include <vector>
 #include <string>
@@ -46,33 +46,42 @@ int main(int, char**) {
         //     Coord({0.0, -3.0}),
 
         // }));
-        Bezier bez = Bezier(std::vector<Coord>({
-            Coord({197.0, 90.0}),
-            Coord({52.0, 133.0}),
-            Coord({50.0, 43.0}),
-            Coord({213.0, 116.0}),
+        // Bezier bez = Bezier(std::vector<Coord>({
+        //     Coord({197.0, 90.0}),
+        //     Coord({52.0, 133.0}),
+        //     Coord({50.0, 43.0}),
+        //     Coord({213.0, 116.0}),
 
-        }));
+        // }));
+
+        Bezier bez = Bezier(randomPoints(9,250,250));
 
         Buffer  bezBuff = createBuffer(bez.degree);
         Segment X       = Segment({Coord({-1000.0, 0.0}), Coord({1000.0, 0.0})});
         Segment A       = Segment({Coord({0.0, 0.0}), Coord({1.0, 1.0})});
         Segment Aprim   = Segment({Coord({1.0, 1.0}), Coord({2.0, 2.0})});
         Segment B       = Segment({Coord({0.0, 1.0}), Coord({1.0, 0.0})});
+        auto curve = casteljau(bez,1000);
+        // std::vector<Coord> tmp = convexBoundingBox(bez);
 
-        std::vector<Coord> tmp = convexHull(bez);
-
-        auto hull = convexHull(bez);
-
-        for (Root r : bez.roots) {
-            if (r.isYaxis) {
-                std::cout << "Root y axis : time t =" << r.time << " x= " << evalCasteljau(bez, r.time, bezBuff).x
-                          << " y = " << evalCasteljau(bez, r.time, bezBuff).y << std::endl;
-            } else {
-                std::cout << "Root x axis : time t =" << r.time << " x= " << evalCasteljau(bez, r.time, bezBuff).x
-                          << " y = " << evalCasteljau(bez, r.time, bezBuff).y << std::endl;
-            }
+        auto                 hull = convexBoundingBox(bez);
+        std::vector<Segment> segs;
+        for (int i = 0; i < hull.size() - 1; i++) {
+            segs.push_back(Segment({hull[i], hull[i + 1]}));
         }
-        
+        segs.push_back(Segment({hull[0], hull[hull.size() - 1]}));
+
+        writeSegmentsVTK(segs,"BoundingbBox.vtk");
+        writeLinesVTK(curve,"curve.vtk");
+        writePointsVTK(bez.controlPoint,"control_points.vtk");
+        // for (Root r : bez.roots) {
+        //     if (r.isYaxis) {
+        //         std::cout << "Root y axis : time t =" << r.time << " x= " << evalCasteljau(bez, r.time, bezBuff).x
+        //                   << " y = " << evalCasteljau(bez, r.time, bezBuff).y << std::endl;
+        //     } else {
+        //         std::cout << "Root x axis : time t =" << r.time << " x= " << evalCasteljau(bez, r.time, bezBuff).x
+        //                   << " y = " << evalCasteljau(bez, r.time, bezBuff).y << std::endl;
+        //     }
+        // }
     }
 }

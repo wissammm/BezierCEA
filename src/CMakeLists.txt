@@ -22,7 +22,7 @@ add_library(Bezier
             Bezier/BezierElevate.h Bezier/BezierElevate.cpp
             Bezier/BezierEvaluate.h Bezier/BezierEvaluate.cpp
             Bezier/BezierRayIntersection.h Bezier/BezierRayIntersection.cpp
-            Bezier/Hull.h Bezier/Hull.cpp)
+            Bezier/BoundingBox.h Bezier/BoundingBox.cpp)
 
 target_include_directories(Bezier PUBLIC ${CMAKE_CURRENT_LIST_DIR}) 
 target_link_libraries (Bezier PUBLIC Geometry Eigen3::Eigen)

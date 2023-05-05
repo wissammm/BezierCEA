@@ -5,12 +5,7 @@
 #include "Bezier/Bezier.h"
 #include <optional>
 
-enum OPTIONS {
-    NAIVE,
-    NEWTON,
-};
 
-bool                   touchHull(Bezier bez, Segment seg);
 double                 newtonMethodIntersectionBezierRay(Bezier bez, double guessT, Segment seg, double epsilon);
 std::vector<CoordTime> intersectionNewtonMethod(Bezier  bez,
                                                 Segment seg,

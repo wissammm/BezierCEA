@@ -29,7 +29,7 @@ struct Bezier
 
     std::vector<CoordTime> lut;
     std::vector<Root> roots;
-    std::vector<Coord> hull;
+    std::vector<Coord> boundingBox;
 
     Bezier(size_t n) {
         controlPoint   = std::vector<Coord>(n);
@@ -55,7 +55,10 @@ struct BezierNormalsAndTangents
     Segments           normals;
     Segments           tangents;
 };
+
 Bezier changeOrigin(Bezier curve, Coord p);
+Bezier changeOriginTo0(Bezier curve, Coord p);
+Bezier rotatePoints(Bezier curve);
 
 Buffer createBuffer(size_t degree);
 Coord randomPoint(int x, int y);

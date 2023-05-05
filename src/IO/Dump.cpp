@@ -53,11 +53,9 @@ void writeSegmentsVTK(const std::vector<Segment>& segments, const std::filesyste
     }
 
     out << "LINES " << (segments.size()) << ' ' << 3 * segments.size() << "\n";
-    // out << points.size();
-    // for (size_t i = 0, n = points.size(); i < n; ++i)
-    //     out << ' ' << i;
+   
     for (size_t i = 0; i < (segments.size() * 2) - 1; i += 2) {
         out << 2 << ' ' << i << ' ' << i + 1 << '\n';
     }
-    // out << "\n";
+    
 }

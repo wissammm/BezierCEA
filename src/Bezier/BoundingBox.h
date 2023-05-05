@@ -1,5 +1,6 @@
 #pragma once
 #include "Geometry/Coord.h"
+#include "Geometry/Newton.h"
 #include <vector>
 #include <optional>
 #include "Geometry/Segment.h"
@@ -15,10 +16,7 @@ std::optional<double> findExtremum(Bezier derivateFirst,
                                    char   axis,
                                    Buffer first,
                                    Buffer second,
-                                   double epsilon      = 1e-5,
-                                   double minRange     = -1,
-                                   double maxRange     = 2,
-                                   double learningRate = 1.);
+                                   const NewtonOptions& options = {});
 std::vector<Root>     rootsFromLUT(Bezier curve, std::vector<CoordTime> lut);
-std::vector<Coord>    simpleHull(Bezier curve);
-std::vector<Coord>    convexHull(Bezier& curve);
+std::vector<Coord>    simpleBoundingBox(Bezier curve);
+std::vector<Coord>    convexBoundingBox(Bezier& curve);
