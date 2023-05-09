@@ -64,7 +64,7 @@ int main(int, char**) {
         auto curve = casteljau(bez,1000);
         // std::vector<Coord> tmp = convexBoundingBox(bez);
 
-        auto                 hull = convexBoundingBox(bez);
+        auto                 hull = AABBtoQuad(convexBoundingBox(bez));
         std::vector<Segment> segs;
         for (int i = 0; i < hull.size() - 1; i++) {
             segs.push_back(Segment({hull[i], hull[i + 1]}));
