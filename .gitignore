@@ -1,6 +1,6 @@
 .vscode/
 main
-build/build/
+build/
 build/build/x64
 /.venv/
 /.vs/
