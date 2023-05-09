@@ -1,0 +1,10 @@
+^C:\WBO\BEZIERCEA\BUILD\CMAKEFILES\0F25CD40A9561E5DB28BE1F07C57CA7E\GENERATE.STAMP.RULE
+setlocal
+C:\Users\WB274724\AppData\Local\Programs\Python\Python311\Lib\site-packages\cmake\data\bin\cmake.exe -SC:/WBO/BezierCEA -BC:/WBO/BezierCEA/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/WBO/BezierCEA/build/Bezier.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

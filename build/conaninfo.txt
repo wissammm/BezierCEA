@@ -1,0 +1,41 @@
+[settings]
+    arch=x86_64
+    build_type=Release
+    compiler=Visual Studio
+    compiler.runtime=MD
+    compiler.version=17
+    os=Windows
+
+[requires]
+    eigen/3.Y.Z
+    gtest/1.Y.Z
+
+[options]
+
+
+[full_settings]
+    arch=x86_64
+    arch_build=x86_64
+    build_type=Release
+    compiler=Visual Studio
+    compiler.runtime=MD
+    compiler.version=17
+    os=Windows
+    os_build=Windows
+
+[full_requires]
+    eigen/3.4.0:5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9
+    gtest/1.13.0:10f3c0a3a24a1055f3670e6694da4a93d078e663
+
+[full_options]
+    eigen:MPL2_only=False
+    gtest:build_gmock=True
+    gtest:hide_symbols=False
+    gtest:no_main=False
+    gtest:shared=False
+
+[recipe_hash]
+
+
+[env]
+

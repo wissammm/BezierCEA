@@ -1,0 +1,12 @@
+# CMake generation dependency list for this directory.
+C:/Users/WB274724/AppData/Local/Programs/Python/Python311/Lib/site-packages/cmake/data/share/cmake-3.26/Modules/CMakeFindDependencyMacro.cmake
+C:/Users/WB274724/AppData/Local/Programs/Python/Python311/Lib/site-packages/cmake/data/share/cmake-3.26/Modules/FindGTest.cmake
+C:/Users/WB274724/AppData/Local/Programs/Python/Python311/Lib/site-packages/cmake/data/share/cmake-3.26/Modules/FindPackageHandleStandardArgs.cmake
+C:/Users/WB274724/AppData/Local/Programs/Python/Python311/Lib/site-packages/cmake/data/share/cmake-3.26/Modules/FindPackageMessage.cmake
+C:/Users/WB274724/AppData/Local/Programs/Python/Python311/Lib/site-packages/cmake/data/share/cmake-3.26/Modules/GoogleTest.cmake
+C:/WBO/BezierCEA/build/GTestConfig.cmake
+C:/WBO/BezierCEA/build/GTestConfigVersion.cmake
+C:/WBO/BezierCEA/build/GTestTarget-debug.cmake
+C:/WBO/BezierCEA/build/GTestTarget-release.cmake
+C:/WBO/BezierCEA/build/GTestTargets.cmake
+C:/WBO/BezierCEA/tests/CMakeLists.txt
