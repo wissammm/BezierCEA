@@ -29,7 +29,6 @@ class Timer
 };
 
 int main(int, char**) {
-    
 
     //  const auto points = randomPoint(6, 50, 50);
 
@@ -41,9 +40,9 @@ int main(int, char**) {
         auto   timer = Timer{"test timer: "};
         Bezier bez   = Bezier(std::vector<Coord>({
             Coord({0.0, 1.0}),
+            Coord({-1.0, 0.0}),
             Coord({-1.0, -1.0}),
-            Coord({-1.0, -2.0}),
-            Coord({0.0, -3.0}),
+            Coord({0.0, -2.0}),
         }));
         // Bezier bez = Bezier(std::vector<Coord>({
         //     Coord({197.0, 90.0}),
@@ -54,11 +53,12 @@ int main(int, char**) {
         // }));
 
         // Bezier bez = Bezier(randomPoints(10, 250, 250));
-        Segment X       = Segment({Coord({-1000.0, 0.0}), Coord({1000.0, 0.0})});
-        auto    vec     = rayBoundingBoxMethod(bez, X, 100);
+        Segment X       = Segment({Coord({-10.0, 0.0000000001}), Coord({5.0, 0.00000000001})});
+        Segment Xinv    = Segment({Coord({5.0, -0.523001}), Coord({-10.0, -0.500789000001})});
+        auto    vec     = rayBoundingBoxMethod(bez, Xinv, 100000);
         Buffer  bezBuff = createBuffer(bez.degree);
-        for (int i = 0; i < vec.size() ; i++) {
-            std::cout << i << " proposition, time = " << vec[i];
+        for (int i = 0; i < vec.size(); i++) {
+            std::cout << i << " proposition, time = " << vec[i]<< std::endl;
         }
 
         // Segment A       = Segment({Coord({0.0, 0.0}), Coord({1.0, 1.0})});

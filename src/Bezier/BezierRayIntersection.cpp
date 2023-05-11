@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <math.h>
 #include <stack>
+#define EPSILON_AABB 0.001
 
 #define TOLERANCE 0.1
 #include <iostream>
@@ -54,33 +55,37 @@ std::vector<double> rayBoundingBoxMethod(Bezier bez, Segment ray, size_t nb_max_
     size_t nb_iter = 0;
 
     std::stack<BezierWithInitialTime> callStack;
-    double                            dy           = ray.b.y / distance(ray);
-    double                            dx           = ray.b.x / distance(ray);
+    double                            dy           = (ray.b.y - ray.a.y) / distance(ray);
+    double                            dx           = (ray.b.x - ray.a.x) / distance(ray);
     auto                              decomposeBez = decompose(bez, 0.5);
     callStack.push(BezierWithInitialTime({decomposeBez[0], 0, 0.5}));
     callStack.push(BezierWithInitialTime({decomposeBez[1], 0.5, 1.0}));
-
-    while (nb_iter < nb_max_iter || callStack.size() != 0) {
+    std::vector<double> timesFoundInterpolate;
+    while (nb_iter < nb_max_iter && callStack.size() > 0) {
         BezierWithInitialTime actualBez = callStack.top();
-        
+        callStack.pop();
 
-        auto aabb = convexBoundingBox(actualBez.bez);
-        if (isIntersectRayAABB(ray.a, Coord({dx, dy}), aabb)) {
-            decomposeBez  = decompose(actualBez.bez, 0.5);
-            double middle = actualBez.tBegin + (actualBez.tBegin - actualBez.tEnd) / 2.0;
-            callStack.push(BezierWithInitialTime({decomposeBez[0], actualBez.tBegin, middle}));
-            callStack.push(BezierWithInitialTime({decomposeBez[1], middle, actualBez.tEnd}));
+        auto aabb  = convexBoundingBox(actualBez.bez);
+        auto inter = isIntersectRayAABB(ray.a, Coord({dx, dy}), aabb);
+        int  a     = 1;
+        if (inter) {
+            if (distance(
+                    Segment(Coord({aabb.base.x, aabb.base.y}), Coord({aabb.base.x + aabb.w, aabb.base.y + aabb.h})))
+
+                < EPSILON_AABB) {
+                timesFoundInterpolate.push_back((actualBez.tEnd - actualBez.tBegin) / 2.0);
+            }
+            else{
+                decomposeBez  = decompose(actualBez.bez, 0.5);
+                double middle = actualBez.tBegin + (actualBez.tEnd - actualBez.tBegin) / 2.0;
+                callStack.push(BezierWithInitialTime({decomposeBez[0], actualBez.tBegin, middle}));
+                callStack.push(BezierWithInitialTime({decomposeBez[1], middle, actualBez.tEnd}));
+            }
         }
 
-        callStack.pop();
+        nb_iter++;
     }
 
-    std::vector<double> timesFoundInterpolate;
-    while(callStack.size()>0){
-        auto b = callStack.top();
-        timesFoundInterpolate.push_back((b.tBegin-b.tEnd)/2);
-        callStack.pop();
-    }
     return timesFoundInterpolate;
 }
 
