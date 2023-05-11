@@ -10,29 +10,34 @@
 #include <optional>
 #include <cmath>
 
-bool isIntersectSegmentBoundingBox(AABB aabb, Segment seg) {
-    if (isPointInAABB(aabb, seg.a) && !isPointInAABB(aabb, seg.b) ||
-        isPointInAABB(aabb, seg.b) && !isPointInAABB(aabb, seg.a))
-        return true;
-    return false;
-}
+#define EPSILON_RAY_INTERSECT 1e-20
 
-// bool isPointInPolygon(std::vector<Coord> hull, Coord point) {
-//     constexpr auto MAX_DOUBLE = std::numeric_limits<double>::max();
-//     Segment        seg        = Segment({point, Coord({MAX_DOUBLE - 1, MAX_DOUBLE - 1})}); //RAYON INFINI
+bool isIntersectRayAABB(Coord rayOrigin, Coord rayDir, AABB aabb) {
+    double epsilon = 0;
+    if (rayDir.x == 0)
+        epsilon = EPSILON_RAY_INTERSECT;
+    auto tmin = (aabb.base.x - rayOrigin.x) / (rayDir.x + epsilon);
+    auto tmax = (aabb.base.x + aabb.w - rayOrigin.x) / (rayDir.x + epsilon);
 
-//     size_t cpt       = 0;
-//     auto   intersect = lineLineIntersection(seg, Segment({hull[0], hull[hull.size() - 1]}));
-//     if (intersect)
-//         cpt++;
-//     for (size_t i = 0; i < hull.size() - 1; ++i) {
-//         intersect = lineLineIntersection(seg, Segment({hull[i], hull[i + 1]}));
-//         if (intersect) {
-//             cpt++;
-//         }
-//     }
-//     return !(cpt % 2);
-// }
+    if (tmin > tmax)
+        std::swap(tmin, tmax);
+
+    if (rayDir.y != 0)
+        epsilon = 0;
+    else
+        epsilon = EPSILON_RAY_INTERSECT;
+
+    auto tymin = (aabb.base.y - rayOrigin.y) / (rayDir.y + epsilon);
+    auto tymax = (aabb.base.y + aabb.h - rayOrigin.y) / (rayDir.y + epsilon);
+
+    if (tymin > tymax)
+        std::swap(tymin, tymax);
+
+    if ((tmin > tymax) || (tymin > tmax))
+        return false;
+
+    return true;
+};
 
 std::vector<Coord> AABBtoQuad(AABB aabb) {
     std::vector<Coord> hull = std::vector<Coord>(4);
@@ -44,8 +49,8 @@ std::vector<Coord> AABBtoQuad(AABB aabb) {
 }
 
 bool isPointInAABB(AABB aabb, Coord point) {
-    if (point.x > aabb.base.x && point.x < aabb.base.x + aabb.w && point.y > aabb.base.y &&
-        point.y < aabb.base.y + aabb.h) {
+    if (point.x >= aabb.base.x && point.x <= aabb.base.x + aabb.w && point.y >= aabb.base.y &&
+        point.y <= aabb.base.y + aabb.h) {
         return true;
     }
     return false;
@@ -62,23 +67,28 @@ bool isAABBintersectAABB(AABB aabb1, AABB aabb2) {
 }
 
 AABB minMaxFromPoints(std::vector<Coord> points) {
-    AABB aabb;
-    aabb.w      = -std::numeric_limits<double>::infinity();
-    aabb.base.x = std::numeric_limits<double>::infinity();
-    aabb.h      = -std::numeric_limits<double>::infinity();
-    aabb.base.y = std::numeric_limits<double>::infinity();
+    AABB   aabb;
+    double xmax = -std::numeric_limits<double>::infinity() + 1;
+    double xmin = std::numeric_limits<double>::infinity();
+    double ymax = -std::numeric_limits<double>::infinity() + 1;
+    double ymin = std::numeric_limits<double>::infinity();
     for (size_t i = 0; i < points.size(); ++i) {
-        if (points[i].x < aabb.base.x) {
-            aabb.base.x = points[i].x;
-        } else if (points[i].x > aabb.base.x + aabb.w) {
-            aabb.w = aabb.w - aabb.base.x;
+        if (points[i].x < xmin) {
+            xmin = points[i].x;
         }
-        if (points[i].y < aabb.base.y) {
-            aabb.base.y = points[i].y;
-        } else if (points[i].y > aabb.base.y + aabb.h) {
-            aabb.h = aabb.h - aabb.base.y;
+        if (points[i].x > xmax) {
+            xmax = points[i].x;
+        }
+        if (points[i].y < ymin) {
+            ymin = points[i].y;
+        }
+        if (points[i].y > ymax) {
+            ymax = points[i].y;
         }
     }
+    aabb.base = Coord({xmin, ymin});
+    aabb.h    = ymax - ymin;
+    aabb.w    = xmax - xmin;
     return aabb;
 }
 
@@ -175,8 +185,10 @@ std::vector<Root> rootsFromLUT(Bezier curve, std::vector<CoordTime> lut) {
 AABB convexBoundingBox(Bezier& curve) {
 
     double nbPointsLUT = 2 * curve.degree; // comme la fréquence d'echantillonage
-    curve.lut          = computeLUT(curve, nbPointsLUT);
-    curve.roots        = rootsFromLUT(curve, curve.lut);
+    if (curve.roots.size() > 0) {
+        curve.lut   = computeLUT(curve, nbPointsLUT);
+        curve.roots = rootsFromLUT(curve, curve.lut);
+    }
     std::vector<Coord> points;
     Buffer             buffer = createBuffer(curve.degree);
     for (Root r : curve.roots) {

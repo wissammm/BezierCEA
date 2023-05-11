@@ -12,4 +12,5 @@ std::vector<CoordTime> intersectionNewtonMethod(Bezier  bez,
                                                 double  epsilon         = 1e-9,
                                                 size_t  nbPointOnBezier = 100);
 std::vector<CoordTime> intersectionNaive(Bezier bez, Segment seg, size_t nbPoints);
+std::vector<double> rayBoundingBoxMethod(Bezier bez, Segment ray, size_t nb_max_iter);
 // std::vector<CoordTime> getAllCoordTimes(Segments segments, Beziers curves, double epsilone, OPTIONS options);

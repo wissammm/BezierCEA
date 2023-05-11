@@ -13,7 +13,7 @@ struct AABB
     Coord  base;
     double w;
     double h;
-    AABB();
+    AABB(){};
     AABB(Coord origin, double width, double height) {
         base = origin;
         w    = width;
@@ -37,3 +37,4 @@ std::optional<double> findExtremum(Bezier               derivateFirst,
 std::vector<Root>     rootsFromLUT(Bezier curve, std::vector<CoordTime> lut);
 AABB                  simpleBoundingBox(Bezier curve);
 AABB                  convexBoundingBox(Bezier& curve);
+bool                  isIntersectRayAABB(Coord rayOrigin, Coord rayDir, AABB aabb);

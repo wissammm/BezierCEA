@@ -29,7 +29,7 @@ class Timer
 };
 
 int main(int, char**) {
-    std::cout << "Hello, world!\n";
+    
 
     //  const auto points = randomPoint(6, 50, 50);
 
@@ -38,14 +38,13 @@ int main(int, char**) {
     int    nb_points_on_curve = 60;
 
     {
-        auto timer = Timer{"test timer: "};
-        // Bezier  bez     = Bezier(std::vector<Coord>({
-        //     Coord({0.0, 1.0}),
-        //     Coord({-1.0, -1.0}),
-        //     Coord({-1.0, -2.0}),
-        //     Coord({0.0, -3.0}),
-
-        // }));
+        auto   timer = Timer{"test timer: "};
+        Bezier bez   = Bezier(std::vector<Coord>({
+            Coord({0.0, 1.0}),
+            Coord({-1.0, -1.0}),
+            Coord({-1.0, -2.0}),
+            Coord({0.0, -3.0}),
+        }));
         // Bezier bez = Bezier(std::vector<Coord>({
         //     Coord({197.0, 90.0}),
         //     Coord({52.0, 133.0}),
@@ -54,32 +53,33 @@ int main(int, char**) {
 
         // }));
 
-        Bezier bez = Bezier(randomPoints(9,250,250));
-
-        Buffer  bezBuff = createBuffer(bez.degree);
+        // Bezier bez = Bezier(randomPoints(10, 250, 250));
         Segment X       = Segment({Coord({-1000.0, 0.0}), Coord({1000.0, 0.0})});
-        Segment A       = Segment({Coord({0.0, 0.0}), Coord({1.0, 1.0})});
-        Segment Aprim   = Segment({Coord({1.0, 1.0}), Coord({2.0, 2.0})});
-        Segment B       = Segment({Coord({0.0, 1.0}), Coord({1.0, 0.0})});
-        auto curve = casteljau(bez,1000);
-        // std::vector<Coord> tmp = convexBoundingBox(bez);
-
-        auto                 hull = AABBtoQuad(convexBoundingBox(bez));
-        std::vector<Segment> segs;
-        for (int i = 0; i < hull.size() - 1; i++) {
-            segs.push_back(Segment({hull[i], hull[i + 1]}));
+        auto    vec     = rayBoundingBoxMethod(bez, X, 100);
+        Buffer  bezBuff = createBuffer(bez.degree);
+        for (int i = 0; i < vec.size() ; i++) {
+            std::cout << i << " proposition, time = " << vec[i];
         }
-        segs.push_back(Segment({hull[0], hull[hull.size() - 1]}));
 
-        writeSegmentsVTK(segs,"BoundingbBox.vtk");
-        writeLinesVTK(curve,"curve.vtk");
-        writePointsVTK(bez.controlPoint,"control_points.vtk");
-        std::vector<Coord> roo;
+        // Segment A       = Segment({Coord({0.0, 0.0}), Coord({1.0, 1.0})});
+        // Segment Aprim   = Segment({Coord({1.0, 1.0}), Coord({2.0, 2.0})});
+        // Segment B       = Segment({Coord({0.0, 1.0}), Coord({1.0, 0.0})});
+        // auto curve = casteljau(bez,1000);
+        // // std::vector<Coord> tmp = convexBoundingBox(bez);
 
-        for (int i = 0; i <bez.roots.size() ; i++) {
-            roo.push_back(evalCasteljau(bez,bez.roots[i].time,bezBuff));
-        }
-        writePointsVTK(roo,"roots.vtk");
+        // auto                 hull = AABBtoQuad(convexBoundingBox(bez));
+        // std::vector<Segment> segs;
 
+        // segs.push_back(Segment({hull[0], hull[hull.size() - 1]}));
+
+        // writeSegmentsVTK(segs,"BoundingbBox.vtk");
+        // writeLinesVTK(curve,"curve.vtk");
+        // writePointsVTK(bez.controlPoint,"control_points.vtk");
+        // std::vector<Coord> roo;
+
+        // for (int i = 0; i <bez.roots.size() ; i++) {
+        //     roo.push_back(evalCasteljau(bez,bez.roots[i].time,bezBuff));
+        // }
+        // writePointsVTK(roo,"roots.vtk");
     }
 }
