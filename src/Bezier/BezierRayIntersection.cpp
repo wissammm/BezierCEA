@@ -9,7 +9,7 @@
 #include <algorithm>
 #include <math.h>
 #include <stack>
-#define EPSILON_AABB 0.001
+#define EPSILON_ANGLE 0.000001
 
 #define TOLERANCE 0.1
 #include <iostream>
@@ -50,6 +50,7 @@ struct BezierWithInitialTime
     double tEnd;
 };
 
+
 std::vector<double> rayBoundingBoxMethod(Bezier bez, Segment ray, size_t nb_max_iter) {
 
     size_t nb_iter = 0;
@@ -67,15 +68,12 @@ std::vector<double> rayBoundingBoxMethod(Bezier bez, Segment ray, size_t nb_max_
 
         auto aabb  = convexBoundingBox(actualBez.bez);
         auto inter = isIntersectRayAABB(ray.a, Coord({dx, dy}), aabb);
-        int  a     = 1;
-        if (inter) {
-            if (distance(
-                    Segment(Coord({aabb.base.x, aabb.base.y}), Coord({aabb.base.x + aabb.w, aabb.base.y + aabb.h})))
 
-                < EPSILON_AABB) {
-                timesFoundInterpolate.push_back((actualBez.tEnd - actualBez.tBegin) / 2.0);
-            }
-            else{
+        if (inter) {
+            if (meanAngleFromControlPoints(actualBez.bez.controlPoint) < EPSILON_ANGLE) {
+                timesFoundInterpolate.push_back(actualBez.tBegin + ((actualBez.tEnd - actualBez.tBegin) / 2.0));
+            } else {
+
                 decomposeBez  = decompose(actualBez.bez, 0.5);
                 double middle = actualBez.tBegin + (actualBez.tEnd - actualBez.tBegin) / 2.0;
                 callStack.push(BezierWithInitialTime({decomposeBez[0], actualBez.tBegin, middle}));

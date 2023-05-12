@@ -26,3 +26,5 @@ std::optional<Coord> lineLineIntersection(Segment seg1, Segment seg2);
 bool                 isOnBothSegments(Coord p, Coord a1, Coord a2, Coord b1, Coord b2);
 int                  orientation(Coord p, Coord q, Coord r);
 bool                 doIntersect(Coord p1, Coord q1, Coord p2, Coord q2);
+double               angle(Coord A, Coord B, Coord C);
+double               meanAngleFromControlPoints(std::vector<Coord> controlPoints);

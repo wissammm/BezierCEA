@@ -18,7 +18,7 @@ double abs(Coord a) { return sqrt(norm(a)); }
 double proj(Coord a, Coord b) { return dot(a, b) / abs(b); }
 
 std::optional<Coord> lineLineIntersection(Coord A, Coord B, Coord C, Coord D) {
-    // 
+    //
 
     // Line AB represented as a1x + b1y = c1
     double a1 = B.y - A.y;
@@ -57,8 +57,11 @@ double distance(Segment seg) { return distance(seg.a, seg.b); }
 double distance(Coord A, Coord B) { return sqrt(pow(B.x - A.x, 2) + pow(B.y - A.y, 2)); }
 
 double determinant(double a1, double a2, double b1, double b2) { return a1 * b2 - a2 * b1; }
+double determinant(Coord A, Coord B) { return determinant(A.x, A.y, B.x, B.y); }
 
-std::optional<Coord> lineLineIntersection(Segment seg1, Segment seg2) { return lineLineIntersection(seg1.a, seg1.b, seg2.a, seg2.b); }
+std::optional<Coord> lineLineIntersection(Segment seg1, Segment seg2) {
+    return lineLineIntersection(seg1.a, seg1.b, seg2.a, seg2.b);
+}
 
 bool onSegment(Coord p, Coord q, Coord r) {
     if (q.x - DELTA <= std::max(p.x, r.x) && q.x + DELTA >= std::min(p.x, r.x) && q.y - DELTA <= std::max(p.y, r.y) &&
@@ -112,8 +115,18 @@ bool doIntersect(Coord p1, Coord q1, Coord p2, Coord q2) {
 
 bool isOnBothSegments(Coord p, Coord a1, Coord a2, Coord b1, Coord b2) {
     if (onSegment(a1, p, a2) && onSegment(b1, p, b2)) {
-        
+
         return true;
     }
     return false;
+}
+
+double angle(Coord A, Coord B, Coord C) { return std::acos(dot(B - A, C - B) / (distance(A, B) * distance(C, B))); }
+
+double meanAngleFromControlPoints(std::vector<Coord> controlPoints) {
+    double meanAngle = 0;
+    for (size_t i = 1; i < controlPoints.size() - 1; i++) {
+        meanAngle += std::abs(angle(controlPoints[i - 1], controlPoints[i], controlPoints[i + 1]));
+    }
+    return meanAngle;
 }
