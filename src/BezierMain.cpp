@@ -1,5 +1,6 @@
 #include "Bezier/Bezier.h"
 #include "Bezier/BezierRayIntersection.h"
+#include "Bezier/BezierCurveCurveIntersection.h"
 #include "Bezier/BezierEvaluate.h"
 #include "Bezier/BoundingBox.h"
 #include "IO/Dump.h"
@@ -44,6 +45,12 @@ int main(int, char**) {
             Coord({-1.0, -1.0}),
             Coord({0.0, -2.0}),
         }));
+        Bezier bez2  = Bezier(std::vector<Coord>({
+            Coord({-1.0, 0.0}),
+            Coord({0.0, 0.70}),
+            Coord({1.0, -1.0}),
+            Coord({2.0, 0.0}),
+        }));
         // Bezier bez = Bezier(std::vector<Coord>({
         //     Coord({197.0, 90.0}),
         //     Coord({52.0, 133.0}),
@@ -55,10 +62,11 @@ int main(int, char**) {
         // Bezier bez = Bezier(randomPoints(10, 250, 250));
         Segment X       = Segment({Coord({-10.0, 0.0000000001}), Coord({5.0, 0.00000000001})});
         Segment Xinv    = Segment({Coord({5.0, -0.523001}), Coord({-10.0, -0.500789000001})});
-        auto    vec     = rayBoundingBoxMethod(bez, Xinv, 100000);
+        // auto    vec     = rayBoundingBoxMethod(bez, Xinv, 100000);
+        auto    vec     = curveCurveBoundingBoxMethod(bez, bez2, 100000);
         Buffer  bezBuff = createBuffer(bez.degree);
         for (int i = 0; i < vec.size(); i++) {
-            std::cout << i << " proposition, time = " << vec[i]<< std::endl;
+            std::cout << i << " proposition, time = " << vec[i] << std::endl;
         }
 
         // Segment A       = Segment({Coord({0.0, 0.0}), Coord({1.0, 1.0})});
