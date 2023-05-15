@@ -88,7 +88,46 @@ TEST(RayIntersectionNaiveNewton, BadFirstGuessNewton) {
     EXPECT_NEAR(u, 0.0, 0.0001) << "First guess is important; u = " << u;
 }
 
-TEST(RayIntersectionNaiveNewton, LikeABully) {
+TEST(RayIntersectionNaiveNewton, LikeABullyNaiveNewton) {
+    std::mt19937                     generator;
+    std::uniform_real_distribution<> distribution(0, 1);
+
+    for (uint_fast16_t i = 3; i < 5; i++) {
+        auto   controlPoint = randomPoints(i, 256, 256);
+        Bezier curve        = Bezier(controlPoint);
+        for (uint_fast16_t j = 0; j < 128; ++j) {
+            auto point = randomPoint(256, 256);
+
+            double  t                  = distribution(generator);
+            Buffer  buffer             = createBuffer(curve.nbControlPoint);
+            Coord   on_curve           = evalCasteljau(curve, t, buffer);
+            Segment seg                = Segment({on_curve, point});
+            auto    intersections      = intersectionNewtonMethod(curve, seg, 0.00000001);
+            bool    one_good_intersect = false;
+            for (size_t k = 0; k < intersections.size(); ++k) {
+                double diff = t - intersections[k].time;
+                if (std::abs(diff) <= 0.001) {
+                    one_good_intersect = true;
+                } else {
+                    std::cout << "not a intersect " << std::endl;
+                }
+            }
+            if (!one_good_intersect) {
+                std::cout << "no intersects, nb of intersection =  " << intersections.size() << std::endl;
+                std::cout << " Point \n x: " << point.x << " y :" << point.y << std::endl;
+                std::cout << " Point On Curve  \n x: " << on_curve.x << " y :" << on_curve.y << std::endl;
+
+                for (size_t k = 0; k < intersections.size(); ++k) {
+
+                    std::cout << "t expected = " << t << " ,t we have" << intersections[k].time << std::endl;
+                }
+            }
+            ASSERT_TRUE(one_good_intersect);
+        }
+    }
+}
+
+TEST(RayIntersectionNaiveNewton, LikeABullyAABBNewton) {
     std::mt19937                     generator;
     std::uniform_real_distribution<> distribution(0, 1);
 

@@ -36,5 +36,5 @@ std::optional<double> findExtremum(Bezier               derivateFirst,
                                    const NewtonOptions& options = {});
 std::vector<Root>     rootsFromLUT(Bezier curve, std::vector<CoordTime> lut);
 AABB                  simpleBoundingBox(Bezier curve);
-AABB                  convexBoundingBox(Bezier& curve);
+AABB                  convexBoundingBox(Bezier curve);
 bool                  isIntersectRayAABB(Coord rayOrigin, Coord rayDir, AABB aabb);
