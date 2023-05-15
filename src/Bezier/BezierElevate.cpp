@@ -3,22 +3,22 @@
 using Eigen::MatrixXd;
 
 Bezier elevate(const Bezier& curve) {
-    Bezier retElevate(curve.nbControlPoint + 1);
+    Bezier retElevate(curve.nbControlPoint() + 1);
     retElevate.controlPoint[0] = curve.controlPoint[0];
 
     Coord tmpPoint;
-    for (size_t i = 1; i < (curve.nbControlPoint + 1); i++) {
-        tmpPoint = (((curve.nbControlPoint - i) * curve.controlPoint[i]) + (curve.controlPoint[i - 1] * i)) /
-                   (curve.nbControlPoint);
+    for (size_t i = 1; i < (curve.nbControlPoint() + 1); i++) {
+        tmpPoint = (((curve.nbControlPoint() - i) * curve.controlPoint[i]) + (curve.controlPoint[i - 1] * i)) /
+                   (curve.nbControlPoint());
         retElevate.controlPoint[i] = tmpPoint;
     }
-    retElevate.controlPoint[curve.nbControlPoint] = curve.controlPoint[curve.degree];
+    retElevate.controlPoint[curve.nbControlPoint()] = curve.controlPoint[curve.degree()];
     return retElevate;
 }
 
 Bezier lower(const Bezier& curve) {
 
-    size_t k = curve.nbControlPoint;
+    size_t k = curve.nbControlPoint();
     size_t n = k - 1;
     Bezier  retLower(n);
 

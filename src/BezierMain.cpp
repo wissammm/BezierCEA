@@ -64,7 +64,7 @@ int main(int, char**) {
         Segment Xinv    = Segment({Coord({5.0, -0.523001}), Coord({-10.0, -0.500789000001})});
         // auto    vec     = rayBoundingBoxMethod(bez, Xinv, 100000);
         auto    vec     = curveCurveBoundingBoxMethod(bez, bez2, 100000);
-        Buffer  bezBuff = createBuffer(bez.degree);
+        Buffer  bezBuff = createBuffer(bez.degree());
         for (int i = 0; i < vec.size(); i++) {
             std::cout << i << " proposition, time = " << vec[i] << std::endl;
         }

@@ -16,36 +16,23 @@ struct CoordTime
 struct Root
 {
     double time;
-    bool isYaxis;
+    bool   isYaxis;
 };
 
 struct Bezier
 {
   public:
     std::vector<Coord> controlPoint;
-    
-    size_t             nbControlPoint;
-    size_t             degree;
 
-    std::vector<CoordTime> lut;
-    std::vector<Root> roots;
-    std::vector<Coord> boundingBox;
+    Bezier(size_t n) { controlPoint = std::vector<Coord>(n); };
+    Bezier(std::vector<Coord> bezierControlPoint) { controlPoint = bezierControlPoint; }
 
-    Bezier(size_t n) {
-        controlPoint   = std::vector<Coord>(n);
-        nbControlPoint = n;
-        degree         = nbControlPoint - 1;
-    };
-    Bezier(std::vector<Coord> bezierControlPoint) {
-        controlPoint   = bezierControlPoint;
-        nbControlPoint = controlPoint.size();
-        degree         = nbControlPoint - 1;
-    }
-
+     size_t nbControlPoint() const { return controlPoint.size(); };
+     size_t degree() const { return controlPoint.size() - 1; };
     // Curve();
     Bezier() = default;
 
-    
+  private:
 };
 using Beziers = std::vector<Bezier>;
 
@@ -60,6 +47,6 @@ Bezier changeOrigin(Bezier curve, Coord p);
 Bezier changeOriginTo0(Bezier curve, Coord p);
 Bezier rotatePoints(Bezier curve);
 
-Buffer createBuffer(size_t degree);
-Coord randomPoint(int x, int y);
+Buffer             createBuffer(size_t degree);
+Coord              randomPoint(int x, int y);
 std::vector<Coord> randomPoints(int n, int x, int y);

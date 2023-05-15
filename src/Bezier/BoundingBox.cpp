@@ -145,8 +145,8 @@ std::vector<Root> rootsFromLUT(Bezier curve, std::vector<CoordTime> lut) {
     Bezier derivFirst  = derivate(curve);
     auto   derivSecond = derivate(derivFirst);
 
-    Buffer bufferDerivFirst  = createBuffer(derivFirst.degree);
-    Buffer bufferDerivSecond = createBuffer(derivSecond.degree);
+    Buffer bufferDerivFirst  = createBuffer(derivFirst.degree());
+    Buffer bufferDerivSecond = createBuffer(derivSecond.degree());
     double tmp               = -1;
     size_t cpt               = 0;
     double rootY             = -1;
@@ -184,13 +184,13 @@ std::vector<Root> rootsFromLUT(Bezier curve, std::vector<CoordTime> lut) {
 }
 AABB convexBoundingBox(Bezier curve) {
 
-    double nbPointsLUT = 2 * curve.degree; // comme la fréquence d'echantillonage
+    double nbPointsLUT = 2 * curve.degree(); // comme la fréquence d'echantillonage
 
     auto lut   = computeLUT(curve, nbPointsLUT);
     auto roots = rootsFromLUT(curve, lut);
 
     std::vector<Coord> points;
-    Buffer             buffer = createBuffer(curve.degree);
+    Buffer             buffer = createBuffer(curve.degree());
     for (Root r : roots) {
         points.push_back(evalCasteljau(curve, r.time, buffer));
     }

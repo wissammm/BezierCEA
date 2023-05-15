@@ -29,8 +29,8 @@ Bezier changeOriginTo0(Bezier curve) {
 
 Bezier rotatePoints(Bezier curve) {
 
-    double             dx           = curve.controlPoint[curve.degree].x;
-    double             dy           = curve.controlPoint[curve.degree].x;
+    double             dx           = curve.controlPoint[curve.degree()].x;
+    double             dy           = curve.controlPoint[curve.degree()].x;
     double             a            = atan2(dy, dx);
     std::vector<Coord> controlPoint = std::vector<Coord>(curve.controlPoint.size());
     for (int i = 0; i < curve.controlPoint.size(); ++i){

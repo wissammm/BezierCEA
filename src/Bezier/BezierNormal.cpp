@@ -21,14 +21,14 @@ Coord computeNormal(Coord tengent) {
 
 
 Coord tangente(Bezier curve, size_t time) {
-    Buffer      buffer      = createBuffer(curve.degree);
+    Buffer      buffer      = createBuffer(curve.degree());
     Bezier       deriv       = derivate(curve);
     const Coord deriv_point = evalCasteljau(deriv, time, buffer);
     return computeTangent(deriv_point);
 }
 
 Coord normal(Bezier curve, size_t time) {
-    Buffer      buffer      = createBuffer(curve.degree);
+    Buffer      buffer      = createBuffer(curve.degree());
     Bezier       deriv       = derivate(curve);
     const Coord deriv_point = evalCasteljau(deriv, time, buffer);
     auto        t           = computeTangent(deriv_point);
@@ -37,7 +37,7 @@ Coord normal(Bezier curve, size_t time) {
 
 BezierNormalsAndTangents normalsAndTangents(const Bezier& bezier, size_t nb_points_on_curve, double factor) {
 
-    Buffer buffer = createBuffer(bezier.degree);
+    Buffer buffer = createBuffer(bezier.degree());
     Bezier  deriv  = derivate(bezier);
 
     auto result = BezierNormalsAndTangents{};
