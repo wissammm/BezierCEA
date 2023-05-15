@@ -12,7 +12,7 @@ struct NaiveOptions
 {
     bool   useSimpleBoundingBox = true;
     size_t nbPointsOnCurve      = 100;
-    size_t maxIter              = 1e10;
+    
 };
 
 struct BoundingBoxOptions
@@ -39,7 +39,7 @@ struct BezierRayIntersectionOption
 };
 
 bool   isControlPointsFlat(std::vector<Coord> controlPoints, double epsilon);
-double newtonMethodIntersectionBezierRay(Bezier bez, double guessT, Segment seg, BoundingBoxOptions aabbOptions);
+std::optional<double> newtonMethodIntersectionBezierRay(Bezier bez, double guessT, Segment seg, BoundingBoxOptions aabbOptions);
 std::vector<double>    rayBoundingBoxMethod(Bezier bez, Segment ray, BezierRayIntersectionOption aabbOption);
 std::vector<CoordTime> intersectionNaiveNewtonMethod(Bezier bez, Segment seg, BezierRayIntersectionOption options);
 std::vector<CoordTime> intersectionNaive(Bezier bez, Segment seg, NaiveOptions naiveOptions);

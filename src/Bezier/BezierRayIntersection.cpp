@@ -17,7 +17,8 @@
 #include <cmath>
 
 bool isControlPointsFlat(std::vector<Coord> controlPoints, double epsilon) {
-    if(controlPoints.size() <= 2) std::cerr << "WARNING : Invalid control point size, may be size 3 or more " << std::endl;
+    if (controlPoints.size() <= 2)
+        std::cerr << "WARNING : Invalid control point size, may be size 3 or more " << std::endl;
     for (size_t i = 1; i < controlPoints.size() - 1; i++) {
         auto A = controlPoints[i - 1];
         auto B = controlPoints[i];
@@ -30,37 +31,39 @@ bool isControlPointsFlat(std::vector<Coord> controlPoints, double epsilon) {
             return false;
         }
     }
-    
+
     return true;
 }
 
-double newtonMethodIntersectionBezierRay(Bezier bez, double guessT, Segment seg, NewtonOptions newtonOption) {
+std::optional<double> newtonMethodIntersectionBezierRay(
+    Bezier bez, double guessT, Segment seg, bool timeOnCurve, NewtonOptions newtonOption) {
     bez                 = changeOrigin(bez, seg.a);
     seg.b               = seg.b - seg.a;
     seg.a               = Coord({0.0, 0.0});
     Bezier deriv        = derivate(bez);
     Buffer bufferBezier = createBuffer(bez.degree());
     Buffer bufferDerive = createBuffer(bez.degree() - 1);
-
+    Coord  Cu, CuPrim;
     //veceur directeur
     double dy = seg.b.y / distance(seg);
     double dx = seg.b.x / distance(seg);
 
     const auto f = [&](double u) {
-        Coord Cu = evalCasteljau(bez, u, bufferBezier);
+        Cu = evalCasteljau(bez, u, bufferBezier);
         return dy * Cu.x - dx * Cu.y;
     };
     const auto df = [&](double u) {
-        Coord CuPrim = evalCasteljau(deriv, u, bufferDerive);
+        CuPrim = evalCasteljau(deriv, u, bufferDerive);
         return dy * CuPrim.x - dx * CuPrim.y;
     };
 
     const auto result = newton(f, df, guessT, newtonOption);
-
-    if (result)
-        return *result;
-    else
-        return guessT;
+    if (!(timeOnCurve) && result) {
+        if (dx > dy)
+            return Cu.x / dx;
+        return Cu.y / dy;
+    }
+    return result;
 }
 //{.epsilon = epsilon, .nMaxIterations = 1000000}
 
@@ -95,8 +98,22 @@ std::vector<double> rayBoundingBoxMethod(Bezier bez, Segment ray, BoundingBoxOpt
 
         nb_iter++;
     }
-
     return timesFoundInterpolate;
+}
+
+std::vector<CoordTime> intersectionBoundingBox(Bezier bez, Segment seg, BoundingBoxOptions aabbOptions) {
+    Buffer                 bufferBezier = createBuffer(bez.degree());
+    auto                   guessesAABB  = rayBoundingBoxMethod(bez, seg, aabbOptions);
+    std::vector<CoordTime> findByNewton;
+
+    for (const double& inter : guessesAABB) {
+        auto newton = newtonMethodIntersectionBezierRay(bez, inter, seg, aabbOptions);
+        if (newton) {
+            findByNewton.push_back({evalCasteljau(bez, *newton, bufferBezier), *newton});
+        }
+    }
+
+    return findByNewton;
 }
 
 std::vector<CoordTime> intersectionNewtonMethod(Bezier                      bez,
@@ -109,8 +126,10 @@ std::vector<CoordTime> intersectionNewtonMethod(Bezier                      bez,
     std::vector<CoordTime> guessesNewton;
 
     for (const CoordTime& inter : guessesNaive) {
-        double newton = newtonMethodIntersectionBezierRay(bez, inter.time, seg, options.newtonOptions);
-        guessesNewton.push_back({evalCasteljau(bez, newton, bufferBezier), newton});
+        auto newton = newtonMethodIntersectionBezierRay(bez, inter.time, seg, options.newtonOptions);
+        if (newton) {
+            guessesNewton.push_back({evalCasteljau(bez, *newton, bufferBezier), *newton});
+        }
     }
     return guessesNewton;
 }
