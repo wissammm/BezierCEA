@@ -62,11 +62,19 @@ int main(int, char**) {
         // Bezier bez = Bezier(randomPoints(10, 250, 250));
         Segment X       = Segment({Coord({-10.0, 0.0000000001}), Coord({5.0, 0.00000000001})});
         Segment Xinv    = Segment({Coord({5.0, -0.523001}), Coord({-10.0, -0.500789000001})});
-        // auto    vec     = rayBoundingBoxMethod(bez, Xinv, 100000);
-        auto    vec     = curveCurveBoundingBoxMethod(bez, bez2, 100000);
+
+        
+        auto vec = intersectionRayBezier(
+            bez, Xinv,
+            {
+                .mode                  = NAIVE,
+                .evaluateCoordOnBezier = true,
+                .aabbOptions           = {.flatAngle = 0.01, .maxDepth = 100000}
+        });
+        
         Buffer  bezBuff = createBuffer(bez.degree());
         for (int i = 0; i < vec.size(); i++) {
-            std::cout << i << " proposition, time = " << vec[i] << std::endl;
+            std::cout << i << " proposition, time = " << vec[i].time << std::endl;
         }
 
         // Segment A       = Segment({Coord({0.0, 0.0}), Coord({1.0, 1.0})});

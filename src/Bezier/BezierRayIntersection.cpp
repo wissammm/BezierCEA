@@ -80,7 +80,12 @@ std::vector<double> rayBoundingBoxMethod(Bezier bez, Segment ray, BoundingBoxOpt
         BezierWithInitialTime actualBez = bezierStack.top();
         bezierStack.pop();
 
-        auto aabb  = convexBoundingBox(actualBez.bez);
+        AABB aabb;
+        if (!aabbOptions.useSimpleBoundingBox)
+            aabb = convexBoundingBox(actualBez.bez);
+        else
+            aabb = simpleBoundingBox(actualBez.bez);
+
         auto inter = isIntersectRayAABB(ray.a, Coord({dx, dy}), aabb);
 
         if (inter) {
@@ -101,13 +106,14 @@ std::vector<double> rayBoundingBoxMethod(Bezier bez, Segment ray, BoundingBoxOpt
     return timesFoundInterpolate;
 }
 
-std::vector<CoordTime> intersectionBoundingBox(Bezier bez, Segment seg, BoundingBoxOptions aabbOptions) {
+std::vector<CoordTime> intersectionBoundingBoxNewton(Bezier bez, Segment seg, BezierRayIntersectionOption options) {
     Buffer                 bufferBezier = createBuffer(bez.degree());
-    auto                   guessesAABB  = rayBoundingBoxMethod(bez, seg, aabbOptions);
+    auto                   guessesAABB  = rayBoundingBoxMethod(bez, seg, options.aabbOptions);
     std::vector<CoordTime> findByNewton;
 
     for (const double& inter : guessesAABB) {
-        auto newton = newtonMethodIntersectionBezierRay(bez, inter, seg, aabbOptions);
+        auto newton =
+            newtonMethodIntersectionBezierRay(bez, inter, seg, options.evaluateCoordOnBezier, options.newtonOptions);
         if (newton) {
             findByNewton.push_back({evalCasteljau(bez, *newton, bufferBezier), *newton});
         }
@@ -116,17 +122,15 @@ std::vector<CoordTime> intersectionBoundingBox(Bezier bez, Segment seg, Bounding
     return findByNewton;
 }
 
-std::vector<CoordTime> intersectionNewtonMethod(Bezier                      bez,
-                                                Segment                     seg,
-                                                double                      epsilon,
-                                                BezierRayIntersectionOption options) {
+std::vector<CoordTime> intersectionNaiveNewtonMethod(Bezier bez, Segment seg, BezierRayIntersectionOption options) {
 
     Buffer                 bufferBezier = createBuffer(bez.degree());
     auto                   guessesNaive = intersectionNaive(bez, seg, options.naiveOptions);
     std::vector<CoordTime> guessesNewton;
 
     for (const CoordTime& inter : guessesNaive) {
-        auto newton = newtonMethodIntersectionBezierRay(bez, inter.time, seg, options.newtonOptions);
+        auto newton = newtonMethodIntersectionBezierRay(bez, inter.time, seg, options.evaluateCoordOnBezier,
+                                                        options.newtonOptions);
         if (newton) {
             guessesNewton.push_back({evalCasteljau(bez, *newton, bufferBezier), *newton});
         }
@@ -136,6 +140,9 @@ std::vector<CoordTime> intersectionNewtonMethod(Bezier                      bez,
 
 std::vector<CoordTime> intersectionNaive(Bezier bez, Segment seg, NaiveOptions naiveOptions) {
     constexpr auto MAX_DOUBLE = std::numeric_limits<double>::max();
+
+    double dy = (seg.b.y - seg.a.y) / distance(seg);
+    double dx = (seg.b.x - seg.a.x) / distance(seg);
 
     std::cerr << "WARNING :  intersectionNaive don't work correctly in certains cases \nWatch Tests" << std::endl;
     AABB aabb;
@@ -149,7 +156,7 @@ std::vector<CoordTime> intersectionNaive(Bezier bez, Segment seg, NaiveOptions n
     auto                   points = casteljau(bez, naiveOptions.nbPointsOnCurve);
     for (int i = 0; i < points.size() - 1; ++i) {
 
-        if (isIntersectSegmentBoundingBox(aabb, seg)) {
+        if (isIntersectRayAABB(seg.a, Coord({dx, dy}), aabb)) {
             auto point = lineLineIntersection(seg.a, seg.b, points[i], points[i + 1]);
 
             if (point) {
@@ -162,4 +169,15 @@ std::vector<CoordTime> intersectionNaive(Bezier bez, Segment seg, NaiveOptions n
         }
     }
     return guesses;
+}
+
+std::vector<CoordTime> intersectionRayBezier(Bezier bez, Segment seg, BezierRayIntersectionOption option) {
+    // {.epsilon = epsilon, .nMaxIterations = 1000000}
+    std::vector<CoordTime> coordTimeVector;
+    if (option.mode == BOUNDING_BOX) {
+        coordTimeVector = intersectionBoundingBoxNewton(bez, seg, option);
+    } else {
+        coordTimeVector = intersectionNaiveNewtonMethod(bez, seg, option);
+    }
+    return coordTimeVector;
 }

@@ -32,14 +32,19 @@ struct BezierWithInitialTime
 
 struct BezierRayIntersectionOption
 {
+    size_t mode = BOUNDING_BOX;
     bool evaluateCoordOnBezier = true;
+    bool isSegment = false;
     NewtonOptions newtonOptions;
     BoundingBoxOptions aabbOptions;
     NaiveOptions       naiveOptions;
 };
 
 bool   isControlPointsFlat(std::vector<Coord> controlPoints, double epsilon);
-std::optional<double> newtonMethodIntersectionBezierRay(Bezier bez, double guessT, Segment seg, BoundingBoxOptions aabbOptions);
+std::optional<double> newtonMethodIntersectionBezierRay(Bezier bez, double guessT, Segment seg, bool timeOnCurve, NewtonOptions options);
+std::vector<CoordTime> intersectionBoundingBoxNewton(Bezier bez, Segment seg, BezierRayIntersectionOption options);
 std::vector<double>    rayBoundingBoxMethod(Bezier bez, Segment ray, BezierRayIntersectionOption aabbOption);
 std::vector<CoordTime> intersectionNaiveNewtonMethod(Bezier bez, Segment seg, BezierRayIntersectionOption options);
 std::vector<CoordTime> intersectionNaive(Bezier bez, Segment seg, NaiveOptions naiveOptions);
+std::vector<CoordTime> intersectionRayBezier(Bezier bez, Segment seg, BezierRayIntersectionOption option);
+

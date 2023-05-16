@@ -200,4 +200,4 @@ AABB convexBoundingBox(Bezier curve) {
     return minMaxFromPoints(points);
 }
 
-AABB minimumBoundingBox(Bezier curve) { return minMaxFromPoints(curve.controlPoint); }
+AABB simpleBoundingBox(Bezier curve) { return minMaxFromPoints(curve.controlPoint); }
