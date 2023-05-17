@@ -4,7 +4,9 @@
 #include "Bezier/BezierEvaluate.h"
 #include "Bezier/BoundingBox.h"
 #include "IO/Dump.h"
-
+#include <optional>
+#include <cmath>
+#include <random>
 #include <chrono>
 #include <vector>
 #include <string>
@@ -13,6 +15,49 @@
 #include <filesystem>
 
 std::filesystem::path getResultPath() { return std::filesystem::u8path(RESULT_DIR); }
+
+void LikeABullyAABBNewton() {
+    std::mt19937                     generator;
+    std::uniform_real_distribution<> distribution(0, 1);
+    int                              cptNotFound = 0;
+    int                              cpt         = 0;
+
+    for (uint_fast16_t i = 3; i < 5; i++) {
+        auto   controlPoint = randomPoints(i, 256, 256);
+        Bezier curve        = Bezier(controlPoint);
+        for (uint_fast16_t j = 0; j < 128; ++j) {
+            auto point = randomPoint(256, 256);
+
+            double  t                  = distribution(generator);
+            Buffer  buffer             = createBuffer(curve.nbControlPoint());
+            Coord   on_curve           = evalCasteljau(curve, t, buffer);
+            Segment seg                = Segment({on_curve, point});
+            auto    intersections      = intersectionRayBezier(curve, seg,
+                                                               {
+                                                                   .mode                  = BOUNDING_BOX,
+                                                                   .evaluateCoordOnBezier = true,
+                                                                   .aabbOptions = {.flatAngle = 0.1, .maxDepth = 15}
+            });
+            bool    one_good_intersect = false;
+            for (size_t k = 0; k < intersections.size(); ++k) {
+                double diff = t - intersections[k].time;
+                if (std::abs(diff) <= 0.001) {
+                    one_good_intersect = true;
+                } else {
+                    // std::cout << "not a intersect " << std::endl;
+                }
+            }
+            if (!one_good_intersect) {
+                cptNotFound++;
+            }
+            cpt++;
+
+        }
+    }
+    std::cout << "AABB : nb intersections not found =  " << cptNotFound << " on " << cpt << " intersections"
+              << std::endl;
+}
+
 
 class Timer
 {
@@ -51,51 +96,88 @@ int main(int, char**) {
             Coord({1.0, -1.0}),
             Coord({2.0, 0.0}),
         }));
-        // Bezier bez = Bezier(std::vector<Coord>({
-        //     Coord({197.0, 90.0}),
-        //     Coord({52.0, 133.0}),
-        //     Coord({50.0, 43.0}),
-        //     Coord({213.0, 116.0}),
 
-        // }));
+        Segment X    = Segment({Coord({-10.0, 0.0000000001}), Coord({5.0, 0.00000000001})});
+        Segment Xinv = Segment({Coord({5.0, -0.523001}), Coord({-10.0, -0.500789000001})});
 
-        // Bezier bez = Bezier(randomPoints(10, 250, 250));
-        Segment X       = Segment({Coord({-10.0, 0.0000000001}), Coord({5.0, 0.00000000001})});
-        Segment Xinv    = Segment({Coord({5.0, -0.523001}), Coord({-10.0, -0.500789000001})});
+        // auto vec = intersectionRayBezier(
+            // bez, Xinv,
+            // {
+                // .mode = NAIVE, .evaluateCoordOnBezier = true, .aabbOptions = {.flatAngle = 0.01, .maxDepth = 100000}
+        // });
 
-        
-        auto vec = intersectionRayBezier(
-            bez, Xinv,
-            {
-                .mode                  = NAIVE,
-                .evaluateCoordOnBezier = true,
-                .aabbOptions           = {.flatAngle = 0.01, .maxDepth = 100000}
-        });
-        
-        Buffer  bezBuff = createBuffer(bez.degree());
-        for (int i = 0; i < vec.size(); i++) {
-            std::cout << i << " proposition, time = " << vec[i].time << std::endl;
-        }
-
-        // Segment A       = Segment({Coord({0.0, 0.0}), Coord({1.0, 1.0})});
-        // Segment Aprim   = Segment({Coord({1.0, 1.0}), Coord({2.0, 2.0})});
-        // Segment B       = Segment({Coord({0.0, 1.0}), Coord({1.0, 0.0})});
-        // auto curve = casteljau(bez,1000);
-        // // std::vector<Coord> tmp = convexBoundingBox(bez);
-
-        // auto                 hull = AABBtoQuad(convexBoundingBox(bez));
-        // std::vector<Segment> segs;
-
-        // segs.push_back(Segment({hull[0], hull[hull.size() - 1]}));
-
-        // writeSegmentsVTK(segs,"BoundingbBox.vtk");
-        // writeLinesVTK(curve,"curve.vtk");
-        // writePointsVTK(bez.controlPoint,"control_points.vtk");
-        // std::vector<Coord> roo;
-
-        // for (int i = 0; i <bez.roots.size() ; i++) {
-        //     roo.push_back(evalCasteljau(bez,bez.roots[i].time,bezBuff));
+        // Buffer bezBuff = createBuffer(bez.degree());
+        // for (int i = 0; i < vec.size(); i++) {
+            // std::cout << i << " proposition, time = " << vec[i].time << std::endl;
         // }
-        // writePointsVTK(roo,"roots.vtk");
     }
+    LikeABullyAABBNewton();
 }
+
+void LikeABullyNaiveNewton() {
+    std::mt19937                     generator;
+    std::uniform_real_distribution<> distribution(0, 1);
+    int                              cptNotFound = 0;
+    int                              cpt         = 0;
+
+    for (uint_fast16_t i = 3; i < 5; i++) {
+        auto   controlPoint = randomPoints(i, 256, 256);
+        Bezier curve        = Bezier(controlPoint);
+        for (uint_fast16_t j = 0; j < 128; ++j) {
+            auto point = randomPoint(256, 256);
+
+            double  t             = distribution(generator);
+            Buffer  buffer        = createBuffer(curve.nbControlPoint());
+            Coord   on_curve      = evalCasteljau(curve, t, buffer);
+            Segment seg           = Segment({on_curve, point});
+            auto    intersections = intersectionRayBezier(
+                curve, seg,
+                {.mode = NAIVE, .evaluateCoordOnBezier = true, .naiveOptions = {.nbPointsOnCurve = 100000}});
+            bool one_good_intersect = false;
+            for (size_t k = 0; k < intersections.size(); ++k) {
+                double diff = t - intersections[k].time;
+                if (std::abs(diff) <= 0.001) {
+                    one_good_intersect = true;
+                } else {
+                    // std::cout << "not a intersect " << std::endl;
+                }
+            }
+            if (!one_good_intersect) {
+                cptNotFound++;
+
+            }
+            // ASSERT_TRUE(one_good_intersect);
+            cpt++;
+        }
+    }
+    std::cout << "NAIVE : nb intersections not found =  " << cptNotFound << " on " << cpt << " intersections"
+              << std::endl;
+}
+
+
+
+
+
+
+
+
+// Segment A       = Segment({Coord({0.0, 0.0}), Coord({1.0, 1.0})});
+// Segment Aprim   = Segment({Coord({1.0, 1.0}), Coord({2.0, 2.0})});
+// Segment B       = Segment({Coord({0.0, 1.0}), Coord({1.0, 0.0})});
+// auto curve = casteljau(bez,1000);
+// // std::vector<Coord> tmp = convexBoundingBox(bez);
+
+// auto                 hull = AABBtoQuad(convexBoundingBox(bez));
+// std::vector<Segment> segs;
+
+// segs.push_back(Segment({hull[0], hull[hull.size() - 1]}));
+
+// writeSegmentsVTK(segs,"BoundingbBox.vtk");
+// writeLinesVTK(curve,"curve.vtk");
+// writePointsVTK(bez.controlPoint,"control_points.vtk");
+// std::vector<Coord> roo;
+
+// for (int i = 0; i <bez.roots.size() ; i++) {
+//     roo.push_back(evalCasteljau(bez,bez.roots[i].time,bezBuff));
+// }
+// writePointsVTK(roo,"roots.vtk");

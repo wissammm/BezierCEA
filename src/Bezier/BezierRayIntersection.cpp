@@ -147,7 +147,7 @@ std::vector<CoordTime> intersectionNaive(Bezier bez, Segment seg, NaiveOptions n
     std::cerr << "WARNING :  intersectionNaive don't work correctly in certains cases \nWatch Tests" << std::endl;
     AABB aabb;
     if (!(naiveOptions.useSimpleBoundingBox)) {
-        std::cerr << "WARNING : rootsBoundingBox can forget some roots in high degree curves" << std::endl;
+        // std::cerr << "WARNING : rootsBoundingBox can forget some roots in high degree curves" << std::endl;
         aabb = convexBoundingBox(bez);
     } else {
         aabb = simpleBoundingBox(bez);
@@ -155,7 +155,6 @@ std::vector<CoordTime> intersectionNaive(Bezier bez, Segment seg, NaiveOptions n
     std::vector<CoordTime> guesses;
     auto                   points = casteljau(bez, naiveOptions.nbPointsOnCurve);
     for (int i = 0; i < points.size() - 1; ++i) {
-
         if (isIntersectRayAABB(seg.a, Coord({dx, dy}), aabb)) {
             auto point = lineLineIntersection(seg.a, seg.b, points[i], points[i + 1]);
 

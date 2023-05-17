@@ -12,7 +12,7 @@ target_include_directories(Geometry PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 # Bezier
 # -----------------------
 
-find_package (Eigen3 3.3 REQUIRED NO_MODULE)
+# find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 
 add_library(Bezier 
             Bezier/Bezier.h Bezier/Bezier.cpp
@@ -26,7 +26,8 @@ add_library(Bezier
             Bezier/BoundingBox.h Bezier/BoundingBox.cpp)
 
 target_include_directories(Bezier PUBLIC ${CMAKE_CURRENT_LIST_DIR}) 
-target_link_libraries (Bezier PUBLIC Geometry Eigen3::Eigen)
+# target_link_libraries (Bezier PUBLIC Geometry Eigen3::Eigen)
+target_link_libraries (Bezier PUBLIC Geometry )
 
 # -----------------------
 # View
