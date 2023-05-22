@@ -138,10 +138,9 @@ std::optional<double> findExtremum(Bezier               derivateFirst,
     return result;
 }
 
-std::vector<Root> rootsFromLUT(Bezier curve, std::vector<CoordTime> lut) {
+std::vector<Root> rootsFromLUT(Bezier curve, std::vector<CoordTime> lut,double epsilon) {
     std::vector<Root> roots;
 
-    double epsilon     = 0.005;
     Bezier derivFirst  = derivate(curve);
     auto   derivSecond = derivate(derivFirst);
 
@@ -187,7 +186,7 @@ AABB convexBoundingBox(Bezier curve) {
     double nbPointsLUT = 2 * curve.degree(); // comme la fréquence d'echantillonage
 
     auto lut   = computeLUT(curve, nbPointsLUT);
-    auto roots = rootsFromLUT(curve, lut);
+    auto roots = rootsFromLUT(curve, lut,0.000001);
 
     std::vector<Coord> points;
     Buffer             buffer = createBuffer(curve.degree());

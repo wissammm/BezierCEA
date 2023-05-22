@@ -89,8 +89,9 @@ std::vector<double> rayBoundingBoxMethod(Bezier bez, Segment ray, BoundingBoxOpt
         auto inter = isIntersectRayAABB(ray.a, Coord({dx, dy}), aabb);
 
         if (inter) {
-            if (isControlPointsFlat(actualBez.bez.controlPoint, aabbOptions.flatAngle) ||
-                actualBez.depth == aabbOptions.maxDepth) {
+            if (isControlPointsFlat(actualBez.bez.controlPoint, aabbOptions.flatAngle) //||
+                // actualBez.depth == aabbOptions.maxDepth
+            ) {
                 timesFoundInterpolate.push_back(actualBez.tBegin + ((actualBez.tEnd - actualBez.tBegin) / 2.0));
             } else {
                 actualBez.depth++;
@@ -159,9 +160,8 @@ std::vector<CoordTime> intersectionNaive(Bezier bez, Segment seg, NaiveOptions n
             auto point = lineLineIntersection(seg.a, seg.b, points[i], points[i + 1]);
 
             if (point) {
-                // if (isOnBothSegments(*point, seg.a, seg.b, points[i], points[i + 1])) 
-                if (onSegment( points[i] , *point ,  points[i + 1])) 
-                { 
+                // if (isOnBothSegments(*point, seg.a, seg.b, points[i], points[i + 1]))
+                if (onSegment(points[i], *point, points[i + 1])) {
 
                     guesses.push_back(CoordTime(
                         {*point, static_cast<double>(i) / static_cast<double>(naiveOptions.nbPointsOnCurve)}));
