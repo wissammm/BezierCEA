@@ -17,7 +17,7 @@ struct NaiveOptions
 
 struct BoundingBoxOptions
 {
-    bool   useSimpleBoundingBox = false;
+    bool   useSimpleBoundingBox = true;
     double flatAngle            = 1e-5;
     size_t maxDepth             = 20;
 };

@@ -144,7 +144,7 @@ std::vector<CoordTime> intersectionNaive(Bezier bez, Segment seg, NaiveOptions n
     double dy = (seg.b.y - seg.a.y) / distance(seg);
     double dx = (seg.b.x - seg.a.x) / distance(seg);
 
-    std::cerr << "WARNING :  intersectionNaive don't work correctly in certains cases \nWatch Tests" << std::endl;
+    // std::cerr << "WARNING :  intersectionNaive don't work correctly in certains cases \nWatch Tests" << std::endl;
     AABB aabb;
     if (!(naiveOptions.useSimpleBoundingBox)) {
         // std::cerr << "WARNING : rootsBoundingBox can forget some roots in high degree curves" << std::endl;
@@ -159,7 +159,9 @@ std::vector<CoordTime> intersectionNaive(Bezier bez, Segment seg, NaiveOptions n
             auto point = lineLineIntersection(seg.a, seg.b, points[i], points[i + 1]);
 
             if (point) {
-                if (isOnBothSegments(*point, seg.a, seg.b, points[i], points[i + 1])) {
+                // if (isOnBothSegments(*point, seg.a, seg.b, points[i], points[i + 1])) 
+                if (onSegment( points[i] , *point ,  points[i + 1])) 
+                { 
 
                     guesses.push_back(CoordTime(
                         {*point, static_cast<double>(i) / static_cast<double>(naiveOptions.nbPointsOnCurve)}));

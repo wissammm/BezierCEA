@@ -21,5 +21,5 @@ add_subdirectory(src)
 
 # enable testing and define tests
 
-# enable_testing()
-# add_subdirectory(tests)
+enable_testing()
+add_subdirectory(tests)
