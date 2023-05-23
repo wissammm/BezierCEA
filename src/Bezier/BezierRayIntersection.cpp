@@ -89,8 +89,8 @@ std::vector<double> rayBoundingBoxMethod(Bezier bez, Segment ray, BoundingBoxOpt
         auto inter = isIntersectRayAABB(ray.a, Coord({dx, dy}), aabb);
 
         if (inter) {
-            if (isControlPointsFlat(actualBez.bez.controlPoint, aabbOptions.flatAngle) //||
-                // actualBez.depth == aabbOptions.maxDepth
+            if (distance(aabb.base, Coord({aabb.base.x + aabb.w,  aabb.base.y + aabb.h})) < aabbOptions.flatAngle ||
+                actualBez.depth == aabbOptions.maxDepth
             ) {
                 timesFoundInterpolate.push_back(actualBez.tBegin + ((actualBez.tEnd - actualBez.tBegin) / 2.0));
             } else {
