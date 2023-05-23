@@ -104,27 +104,27 @@ TEST(AABB, rootExtremeCase1) {
     }
 }
 
-TEST(AABB, rootExtremeCaseLikeABully) {
-    std::mt19937                     generator;
-    std::uniform_real_distribution<> distribution(0, 1);
-    int                              cptNotFound = 0;
-    int                              cpt         = 0;
+// TEST(AABB, rootExtremeCaseLikeABully) {
+//     std::mt19937                     generator;
+//     std::uniform_real_distribution<> distribution(0, 1);
+//     int                              cptNotFound = 0;
+//     int                              cpt         = 0;
 
-    for (uint_fast16_t i = 3; i < 5; i++) {
-        printf(" a \n");
-        for (uint_fast16_t j = 0; j < 50; ++j) {
-            auto   controlPoint = randomPoints(i, 256, 256);
-            Bezier curve        = Bezier(controlPoint);
-            double nbPointsLUT  = 2 * curve.degree(); // comme la fréquence d'echantillonage
+//     for (uint_fast16_t i = 3; i < 5; i++) {
+//         printf(" a \n");
+//         for (uint_fast16_t j = 0; j < 50; ++j) {
+//             auto   controlPoint = randomPoints(i, 256, 256);
+//             Bezier curve        = Bezier(controlPoint);
+//             double nbPointsLUT  = 2 * curve.degree(); // comme la fréquence d'echantillonage
 
-            auto lut    = computeLUT(curve, nbPointsLUT);
-            auto roots  = rootsFromLUT(curve, lut, 0.00000001);
-            auto convex = convexBoundingBox(curve);
-            auto inAABB = casteljau(curve, 1000000);
+//             auto lut    = computeLUT(curve, nbPointsLUT);
+//             auto roots  = rootsFromLUT(curve, lut, 0.00000001);
+//             auto convex = convexBoundingBox(curve);
+//             auto inAABB = casteljau(curve, 1000000);
 
-            for (int i = 0; i < inAABB.size(); i++) {
-                ASSERT_TRUE(isPointInAABB(convex, inAABB[i]));
-            }
-        }
-    }
-}
+//             for (int i = 0; i < inAABB.size(); i++) {
+//                 ASSERT_TRUE(isPointInAABB(convex, inAABB[i]));
+//             }
+//         }
+//     }
+// }

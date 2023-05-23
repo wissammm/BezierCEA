@@ -17,13 +17,22 @@
 //TODO : Mettre a jour les appels de tests
 
 TEST(Angle, flatAngle) {
-    auto aabb1 = std::vector<Coord>{Coord({1, 0}), Coord({0, 0}), Coord({1, 1}), Coord({0, 1})};
+    auto points = std::vector<Coord>{Coord({0, 0}), Coord({1, 0}), Coord({2, 15})};
 
-    auto hull1 = minMaxFromPoints(aabb1);
+    auto flat = isControlPointsFlat(points, 0.0001);
+    EXPECT_FALSE(flat);
 
-    auto aabb2 = std::vector<Coord>{Coord({1.5, 0.5}), Coord({0.5, 0.5}), Coord({1.5, 1.5}), Coord({0.5, 1.5})};
+    points = std::vector<Coord>{Coord({0, 0}), Coord({1, 0}), Coord({2, 0.000000000001})};
 
-    auto hull2 = minMaxFromPoints(aabb2);
+    flat = isControlPointsFlat(points, 0.0001);
+    EXPECT_TRUE(flat);
 
-    EXPECT_TRUE(isAABBintersectAABB(hull1, hull2));
+}
+
+TEST(Angle, flatAngleSpecialCase1) {
+    auto points = std::vector<Coord>{Coord({103, 198}), Coord({105, 115}), Coord({81, 255})};
+
+    auto flat = isControlPointsFlat(points, 0.00000000000000001);
+    EXPECT_FALSE(flat);
+
 }
