@@ -5,6 +5,7 @@
 #include "BezierDecompose.h"
 #include "BoundingBox.h"
 #include "Geometry/Newton.h"
+#include "Geometry/Doublons.h"
 #include "Geometry/Segment.h"
 #include <optional>
 #include <algorithm>
@@ -34,8 +35,6 @@ bool isControlPointsFlat(std::vector<Coord> controlPoints, double epsilon) {
 
     return true;
 }
-
-
 
 std::optional<double> newtonMethodIntersectionBezierRay(
     Bezier bez, double guessT, Segment seg, bool timeOnCurve, NewtonOptions newtonOption) {
@@ -109,8 +108,16 @@ std::vector<double> rayBoundingBoxMethod(Bezier bez, Segment ray, BoundingBoxOpt
 }
 
 std::vector<CoordTime> intersectionBoundingBoxNewton(Bezier bez, Segment seg, BezierRayIntersectionOption options) {
-    Buffer                 bufferBezier = createBuffer(bez.degree());
-    auto                   guessesAABB  = rayBoundingBoxMethod(bez, seg, options.aabbOptions);
+    Buffer bufferBezier = createBuffer(bez.degree());
+    auto   guessesAABB  = rayBoundingBoxMethod(bez, seg, options.aabbOptions);
+    if (options.avoidDoublons) {
+        const auto f = [&](double a, double b) {
+            
+            return std::abs(a - b)<options.epsilonDoublons;
+        };
+        
+        guessesAABB = doublons(guessesAABB,f);
+    }
     std::vector<CoordTime> findByNewton;
 
     for (const double& inter : guessesAABB) {

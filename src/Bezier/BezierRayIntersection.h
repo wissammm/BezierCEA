@@ -16,7 +16,6 @@ struct NaiveOptions
 
 struct BoundingBoxOptions
 {
-    double epsilonDoublons      = 0.0;
     bool   useSimpleBoundingBox = true;
     double epsilon              = 1e-5;
     size_t maxDepth             = 20;
@@ -35,7 +34,8 @@ struct BezierRayIntersectionOption
     size_t             mode                  = BOUNDING_BOX;
     bool               evaluateCoordOnBezier = true;
     bool               isSegment             = false;
-    double             avoidDouble           = 0.0;
+    bool               avoidDoublons         = true;
+    bool               epsilonDoublons         = 0.00001;
     NewtonOptions      newtonOptions;
     BoundingBoxOptions aabbOptions;
     NaiveOptions       naiveOptions;
