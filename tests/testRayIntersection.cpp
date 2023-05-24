@@ -175,7 +175,7 @@ TEST(RayIntersectionNaiveNewton, LikeABullyAABBNewton) {
                                                                    .evaluateCoordOnBezier = true,
                                                                    .isSegment             = false,
                                                                    .newtonOptions         = {.epsilon = 0.001},
-                                                                   .aabbOptions = {.flatAngle = 0.01, .maxDepth = 30}
+                                                                   .aabbOptions = {.epsilon = 0.01, .maxDepth = 30}
             });
             bool    one_good_intersect = false;
             for (size_t k = 0; k < intersections.size(); ++k) {
@@ -221,7 +221,7 @@ TEST(RayIntersectionNaiveNewton, SpecialCase1) {
                                                            .evaluateCoordOnBezier = true,
                                                            .isSegment             = false,
                                                            .newtonOptions         = {.epsilon = 0.001},
-                                                           .aabbOptions           = {.flatAngle = 0.000000001, .maxDepth = 10}
+                                                           .aabbOptions           = {.epsilon = 0.000000001, .maxDepth = 10}
     });
     bool    one_good_intersect = false;
     for (size_t k = 0; k < intersections.size(); ++k) {

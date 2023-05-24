@@ -35,6 +35,8 @@ bool isControlPointsFlat(std::vector<Coord> controlPoints, double epsilon) {
     return true;
 }
 
+
+
 std::optional<double> newtonMethodIntersectionBezierRay(
     Bezier bez, double guessT, Segment seg, bool timeOnCurve, NewtonOptions newtonOption) {
     bez                 = changeOrigin(bez, seg.a);
@@ -89,9 +91,8 @@ std::vector<double> rayBoundingBoxMethod(Bezier bez, Segment ray, BoundingBoxOpt
         auto inter = isIntersectRayAABB(ray.a, Coord({dx, dy}), aabb);
 
         if (inter) {
-            if (distance(aabb.base, Coord({aabb.base.x + aabb.w,  aabb.base.y + aabb.h})) < aabbOptions.flatAngle ||
-                actualBez.depth == aabbOptions.maxDepth
-            ) {
+            if (distance(aabb.base, Coord({aabb.base.x + aabb.w, aabb.base.y + aabb.h})) < aabbOptions.epsilon ||
+                actualBez.depth == aabbOptions.maxDepth) {
                 timesFoundInterpolate.push_back(actualBez.tBegin + ((actualBez.tEnd - actualBez.tBegin) / 2.0));
             } else {
                 actualBez.depth++;

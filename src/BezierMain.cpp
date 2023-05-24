@@ -36,7 +36,7 @@ void LikeABullyAABBNewton() {
                                                                {
                                                                    .mode                  = BOUNDING_BOX,
                                                                    .evaluateCoordOnBezier = true,
-                                                                   .aabbOptions = {.flatAngle = 0.1, .maxDepth = 15}
+                                                                   .aabbOptions = {.epsilon = 0.1, .maxDepth = 15}
             });
             bool    one_good_intersect = false;
             for (size_t k = 0; k < intersections.size(); ++k) {
@@ -51,13 +51,11 @@ void LikeABullyAABBNewton() {
                 cptNotFound++;
             }
             cpt++;
-
         }
     }
     std::cout << "AABB : nb intersections not found =  " << cptNotFound << " on " << cpt << " intersections"
               << std::endl;
 }
-
 
 class Timer
 {
@@ -101,17 +99,57 @@ int main(int, char**) {
         Segment Xinv = Segment({Coord({5.0, -0.523001}), Coord({-10.0, -0.500789000001})});
 
         // auto vec = intersectionRayBezier(
-            // bez, Xinv,
-            // {
-                // .mode = NAIVE, .evaluateCoordOnBezier = true, .aabbOptions = {.flatAngle = 0.01, .maxDepth = 100000}
+        // bez, Xinv,
+        // {
+        // .mode = NAIVE, .evaluateCoordOnBezier = true, .aabbOptions = {.flatAngle = 0.01, .maxDepth = 100000}
         // });
 
         // Buffer bezBuff = createBuffer(bez.degree());
         // for (int i = 0; i < vec.size(); i++) {
-            // std::cout << i << " proposition, time = " << vec[i].time << std::endl;
+        // std::cout << i << " proposition, time = " << vec[i].time << std::endl;
         // }
     }
     LikeABullyAABBNewton();
+}
+
+struct BezierPerf
+{
+    std::vector<Bezier>  beziers;
+    std::vector<Segment> ray;
+};
+
+BezierPerf createPerfModel() {
+    BezierPerf perf;
+    for (size_t i = 0; i < 1000; ++i) {
+        auto   controlPoint = randomPoints(5, 256, 256);
+        Bezier curve        = Bezier(controlPoint);
+        perf.beziers.push_back(curve);
+    }
+    for (size_t i = 0; i < 100; ++i) {
+        auto point1 = randomPoint(256, 256);
+        auto point2 = randomPoint(256, 256);
+        perf.ray.push_back(Segment({point1, point2}));
+    }
+    return perf;
+}
+
+void evaluatePerf() {
+    auto perf = createPerfModel();
+    {
+        auto timer = Timer{"AABB: "};
+        for (int i = 0; i < perf.beziers.size(); ++i) {
+            for (int j = 0; i < perf.ray.size(); ++j) {
+                intersectionRayBezier(perf.beziers[i], perf.ray[j],
+                                      {
+                                          .mode                  = BOUNDING_BOX,
+                                          .evaluateCoordOnBezier = true,
+                                          .isSegment             = false,
+                                          .newtonOptions         = {.epsilon = 0.001},
+                                          .aabbOptions           = {.epsilon = 0.0000001, .maxDepth = 10}
+                });
+            }
+        }
+    }
 }
 
 void LikeABullyNaiveNewton() {
@@ -144,7 +182,6 @@ void LikeABullyNaiveNewton() {
             }
             if (!one_good_intersect) {
                 cptNotFound++;
-
             }
             // ASSERT_TRUE(one_good_intersect);
             cpt++;
@@ -153,13 +190,6 @@ void LikeABullyNaiveNewton() {
     std::cout << "NAIVE : nb intersections not found =  " << cptNotFound << " on " << cpt << " intersections"
               << std::endl;
 }
-
-
-
-
-
-
-
 
 // Segment A       = Segment({Coord({0.0, 0.0}), Coord({1.0, 1.0})});
 // Segment Aprim   = Segment({Coord({1.0, 1.0}), Coord({2.0, 2.0})});
