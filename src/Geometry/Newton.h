@@ -2,6 +2,7 @@
 #include <cmath>
 #include <cstdint>
 #include <optional>
+#include <array>
 
 constexpr auto MAX_DOUBLE = std::numeric_limits<double>::max();
 
@@ -30,35 +31,37 @@ std::optional<double> newton(F f, DF df, double firstGuess, const NewtonOptions&
     return std::nullopt;
 }
 
-// template<typename F, typename DFU, typename DFV> //
-// bool newtonRalphson(F f, DFU dfu, DFV dfv, Coord& uv, double uvEpsilon, size_t nMaxIteration) {
-//     for (size_t iIteration = 0; iIteration < nMaxIteration; ++iIteration) {
-//         const auto evalF  = f(uv);
-//         const auto evalFu = dfu(uv);
-//         const auto evalFv = dfv(uv);
+inline std::array<double, 4> inverse(const std::array<double, 4>& m) {
+    const double det = m[0] * m[3] - m[1] * m[2];
 
-//         const auto JF = std::array<double, 4>{evalFu.getX(), evalFv.getX(), evalFu.getY(), evalFv.getY()};
+    // clang-format off
+    return {
+        m[3] / det, -m[1] / det,
+        -m[2] / det,  m[0] / det
+    };
+    // clang-format on
+}
 
-//         const auto JFInv = inverse(JF);
+template<typename F, typename DFU, typename DFV, typename EVAL> //
+std::optional<double> newtonRalphson(
+    F f, DFU dfu, DFV dfv, EVAL eval, double u, double v, double uvEpsilon, size_t nMaxIteration) {
+    for (size_t iIteration = 0; iIteration < nMaxIteration; ++iIteration) {
 
-//         const auto previousUV = uv;
-//         uv[0] -= JFInv[0] * evalF[0] + JFInv[1] * evalF[1];
-//         uv[1] -= JFInv[2] * evalF[0] + JFInv[3] * evalF[1];
+        const auto evalF  = f(u, v);
+        const auto evalFu = dfu(u, v);
+        const auto evalFv = dfv(u, v);
 
-//         if (distance(previousUV, uv) <= uvEpsilon)
-//             return true;
-//     }
+        const auto JF = std::array<double, 4>{evalFu.getX(), evalFv.getX(), evalFu.getY(), evalFv.getY()};
 
-//     return false;
-// }
+        const auto JFInv = inverse(JF);
 
-// inline std::array<double, 4> inverse(const std::array<double, 4>& m) {
-//     const double det = m[0] * m[3] - m[1] * m[2];
+        const auto previousUV = uv;
+        uv[0] -= JFInv[0] * evalF[0] + JFInv[1] * evalF[1];
+        uv[1] -= JFInv[2] * evalF[0] + JFInv[3] * evalF[1];
 
-//     // clang-format off
-//     return {
-//         m[3] / det, -m[1] / det,
-//         -m[2] / det,  m[0] / det
-//     };
-//     // clang-format on
-// }
+        if (distance(previousUV, uv) <= uvEpsilon)
+            return true;
+    }
+
+    return false;
+}

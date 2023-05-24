@@ -35,7 +35,7 @@ struct BezierRayIntersectionOption
     bool               evaluateCoordOnBezier = true;
     bool               isSegment             = false;
     bool               avoidDoublons         = true;
-    bool               epsilonDoublons         = 0.00001;
+    double               epsilonDoublons       = 0.01;
     NewtonOptions      newtonOptions;
     BoundingBoxOptions aabbOptions;
     NaiveOptions       naiveOptions;

@@ -14,9 +14,10 @@ template<typename F> std::vector<double> doublons(std::vector<double> tabDouble,
     auto tmpCompare = tabDouble[0];
     retVector.push_back(tabDouble[0]);
     for (uint64_t i = 1; i < tabDouble.size(); ++i) {
+        auto b = f(tmpCompare, tabDouble[i]);
         if (!f(tmpCompare, tabDouble[i])) {
             retVector.push_back(tabDouble[i]);
-            auto tmpCompare = tabDouble[i];
+            tmpCompare = tabDouble[i];
         }
     }
     return retVector;

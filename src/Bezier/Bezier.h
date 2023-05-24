@@ -27,8 +27,8 @@ struct Bezier
     Bezier(size_t n) { controlPoint = std::vector<Coord>(n); };
     Bezier(std::vector<Coord> bezierControlPoint) { controlPoint = bezierControlPoint; }
 
-     size_t nbControlPoint() const { return controlPoint.size(); };
-     size_t degree() const { return controlPoint.size() - 1; };
+    size_t nbControlPoint() const { return controlPoint.size(); };
+    size_t degree() const { return controlPoint.size() - 1; };
     // Curve();
     Bezier() = default;
 

@@ -7,8 +7,10 @@ struct Coord
 {
     double x;
     double y;
-};
 
+    double getX() const { return x; };
+    double getY() const { return y; };
+};
 
 Coord operator-(const Coord& coord);
 Coord operator+(const Coord& coord1, const Coord& coord2);
