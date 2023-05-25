@@ -43,7 +43,7 @@ inline std::array<double, 4> inverse(const std::array<double, 4>& m) {
 }
 
 template<typename F, typename DFU, typename DFV, typename EVAL> //
-std::optional<double> newtonRalphson(
+std::optional<std::vector<double>> newtonRalphson(
     F f, DFU dfu, DFV dfv, EVAL eval, double u, double v, double uvEpsilon, size_t nMaxIteration) {
     for (size_t iIteration = 0; iIteration < nMaxIteration; ++iIteration) {
 
@@ -51,16 +51,14 @@ std::optional<double> newtonRalphson(
         const auto evalFu = dfu(u, v);
         const auto evalFv = dfv(u, v);
 
-        const auto JF = std::array<double, 4>{evalFu.getX(), evalFv.getX(), evalFu.getY(), evalFv.getY()};
+        const double prevU = u;
+        const double prevV = v;
 
-        const auto JFInv = inverse(JF);
+        u = (-evalF + evalFu * prevU)/evalFu;
+        v = (-evalF + evalFv * prevV)/evalFv;
 
-        const auto previousUV = uv;
-        uv[0] -= JFInv[0] * evalF[0] + JFInv[1] * evalF[1];
-        uv[1] -= JFInv[2] * evalF[0] + JFInv[3] * evalF[1];
-
-        if (distance(previousUV, uv) <= uvEpsilon)
-            return true;
+        if (u < 0.01 && v < 0.01)
+            return std::vector<double;
     }
 
     return false;
