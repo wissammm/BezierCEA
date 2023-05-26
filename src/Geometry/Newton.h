@@ -42,27 +42,27 @@ inline std::array<double, 4> inverse(const std::array<double, 4>& m) {
     // clang-format on
 }
 
-template<typename F, typename DFU, typename DFV, typename EVAL> //
-std::optional<std::vector<double>> newtonRalphson(
-    F f, DFU dfu, DFV dfv, EVAL eval, double u, double v, double uvEpsilon, size_t nMaxIteration) {
-    for (size_t iIteration = 0; iIteration < nMaxIteration; ++iIteration) {
+// template<typename F, typename DFU, typename DFV, typename EVAL> //
+// std::optional<std::vector<double>> newtonRalphson(
+//     F f, DFU dfu, DFV dfv, EVAL eval, double u, double v, double uvEpsilon, size_t nMaxIteration) {
+//     for (size_t iIteration = 0; iIteration < nMaxIteration; ++iIteration) {
 
-        const auto evalF  = f(u, v);
-        const auto evalFu = dfu(u, v);
-        const auto evalFv = dfv(u, v);
+//         const auto evalF  = f(u, v);
+//         const auto evalFu = dfu(u, v);
+//         const auto evalFv = dfv(u, v);
 
-        const auto JF = std::array<double, 4>{evalFu.getX(), evalFv.getX(), //
-                                              evalFu.getY(), evalFv.getY()};
+//         const auto JF = std::array<double, 4>{evalFu.getX(), evalFv.getX(), //
+//                                               evalFu.getY(), evalFv.getY()};
 
-        const auto JFInv = inverse(JF);
+//         const auto JFInv = inverse(JF);
 
-        const auto previousUV = Coord({u,v});
-        uv.x -= JFInv[0] * evalF[0] + JFInv[1] * evalF[1];
-        uv.y -= JFInv[2] * evalF[0] + JFInv[3] * evalF[1];
+//         const auto previousUV = Coord({u,v});
+//         uv.x -= JFInv[0] * evalF[0] + JFInv[1] * evalF[1];
+//         uv.y -= JFInv[2] * evalF[0] + JFInv[3] * evalF[1];
 
-        if (distance(previousUV, uv) <= uvEpsilon)
-            return true;
-    }
+//         if (distance(previousUV, uv) <= uvEpsilon)
+//             return true;
+//     }
 
-    return false;
-}
+//     return false;
+// }

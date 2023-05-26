@@ -7,6 +7,8 @@
 using Buffer   = std::vector<std::vector<Coord>>;
 using Segments = std::vector<Segment>;
 
+
+
 struct CoordTime
 {
     Coord  coord;
@@ -34,6 +36,15 @@ struct Bezier
 
   private:
 };
+
+struct BezierWithInitialTime
+{
+    Bezier bez;
+    double tBegin;
+    double tEnd;
+    size_t depth = 0;
+};
+
 using Beziers = std::vector<Bezier>;
 
 struct BezierNormalsAndTangents

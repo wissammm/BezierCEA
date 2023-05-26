@@ -22,6 +22,7 @@ add_library(Bezier
             Bezier/BezierDerivate.h Bezier/BezierDerivate.cpp
             Bezier/BezierElevate.h Bezier/BezierElevate.cpp
             Bezier/BezierEvaluate.h Bezier/BezierEvaluate.cpp
+            Bezier/PointOnCurve.h Bezier/PointOnCurve.cpp
             Bezier/BezierRayIntersection.h Bezier/BezierRayIntersection.cpp
             Bezier/BezierCurveCurveIntersection.h Bezier/BezierCurveCurveIntersection.cpp
             Bezier/BoundingBox.h Bezier/BoundingBox.cpp)

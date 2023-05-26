@@ -9,13 +9,6 @@
 #include "Geometry/Segment.h"
 #define EPSILON_ANGLE 0.00000001
 
-struct BezierWithInitialTime
-{
-    Bezier bez;
-    double tBegin;
-    double tEnd;
-};
-
 std::optional<double> newtonMethodIntersectionBezierBezier(Bezier        bez1,
                                                            Bezier        bez2,
                                                            double        guessT,

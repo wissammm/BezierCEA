@@ -21,13 +21,7 @@ struct BoundingBoxOptions
     size_t maxDepth             = 20;
 };
 
-struct BezierWithInitialTime
-{
-    Bezier bez;
-    double tBegin;
-    double tEnd;
-    size_t depth = 0;
-};
+
 
 struct BezierRayIntersectionOption
 {
