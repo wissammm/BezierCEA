@@ -1,6 +1,7 @@
 #include "BezierCurveCurveIntersection.h"
 #include <vector>
 #include <stack>
+#include <cmath>
 #include "Bezier.h"
 #include "BezierDecompose.h"
 #include "BezierDerivate.h"
@@ -34,30 +35,33 @@ std::optional<double> newtonMethodIntersectionBezierBezier(Bezier        bez1,
     const auto f = [&](double u, double v) {
         Cu = evalCasteljau(bez1, u, bufferBezier1);
         Cv = evalCasteljau(bez2, v, bufferBezier2);
-        return dot(Cv - Cu, Cv - Cu);
+        return Coord({(std::pow(Cv.x - Cu.x, 2)) * 2, //
+                      (std::pow(Cv.y - Cu.y, 2)) * 2});
     };
-    const auto dfu = [&](double u,double v) {
-        Cu = evalCasteljau(bez1, u, bufferBezier1);
+    const auto dfu = [&](double u, double v) {
+        Cu     = evalCasteljau(bez1, u, bufferBezier1);
+        Cv     = evalCasteljau(bez2, v, bufferBezier2);
         CuPrim = evalCasteljau(deriv1, u, bufferDerive1);
-        Cv = evalCasteljau(bez2, v, bufferBezier2);
-        return -2 * dot(Cv - Cu, CuPrim);
+
+        return Coord({-2 * (std::pow(Cv.x - Cu.x, 2) + std::pow(CuPrim.x, 2)),
+                      -2 * (std::pow(Cv.y - Cu.y, 2) + std::pow(CuPrim.y, 2))});
     };
     const auto dfv = [&](double u, double v) {
-        Cu = evalCasteljau(bez1, u, bufferBezier1);
+        Cu     = evalCasteljau(bez1, u, bufferBezier1);
+        Cv     = evalCasteljau(bez2, v, bufferBezier2);
         CvPrim = evalCasteljau(deriv2, v, bufferDerive2);
-        Cv = evalCasteljau(bez2, v, bufferBezier2);
-        return -2 * dot(Cv - Cu, CuPrim);
+        return Coord({2 * (std::pow(Cv.x - Cu.x, 2) + std::pow(CvPrim.x, 2)),
+                      2 * (std::pow(Cv.y - Cu.y, 2) + std::pow(CvPrim.y, 2))});
     };
 
-    const auto result = newton(f, df, guessT, newtonOption);
+    // const auto result = newton(f, df, guessT, newtonOption);
     // if (!(timeOnCurve) && result) {
     //     if (dx > dy)
     //         return Cu.x / dx;
     //     return Cu.y / dy;
     // }
-    // return result;
+    return std::nullopt;
 }
-
 
 std::vector<double> curveCurveBoundingBoxMethod(Bezier bez1, Bezier bez2, size_t nb_max_iter) {
     size_t nb_iter = 0;

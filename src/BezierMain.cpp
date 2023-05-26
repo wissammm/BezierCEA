@@ -2,6 +2,7 @@
 #include "Bezier/BezierRayIntersection.h"
 #include "Bezier/BezierCurveCurveIntersection.h"
 #include "Bezier/BezierEvaluate.h"
+#include "Bezier/BezierDerivate.h"
 #include "Bezier/BoundingBox.h"
 #include "IO/Dump.h"
 #include <optional>
@@ -82,7 +83,7 @@ int main(int, char**) {
 
     {
         auto   timer = Timer{"test timer: "};
-        Bezier bez   = Bezier(std::vector<Coord>({
+        Bezier bez1  = Bezier(std::vector<Coord>({
             Coord({0.0, 1.0}),
             Coord({-1.0, 0.0}),
             Coord({-1.0, -1.0}),
@@ -98,6 +99,32 @@ int main(int, char**) {
         Segment X    = Segment({Coord({-10.0, 0.0000000001}), Coord({5.0, 0.00000000001})});
         Segment Xinv = Segment({Coord({5.0, -0.523001}), Coord({-10.0, -0.500789000001})});
 
+        Bezier deriv1        = derivate(bez1);
+        Buffer bufferBezier1 = createBuffer(bez1.degree());
+        Buffer bufferDerive1 = createBuffer(bez1.degree() - 1);
+
+        Bezier deriv2        = derivate(bez2);
+        Buffer bufferBezier2 = createBuffer(bez2.degree());
+        Buffer bufferDerive2 = createBuffer(bez2.degree() - 1);
+
+        Coord  Cu, CuPrim;
+        Coord  Cv, CvPrim;
+        double u = 0.5;
+        double v = 0.5;
+        Cu       = evalCasteljau(bez1, u, bufferBezier1);
+        Cv       = evalCasteljau(bez2, v, bufferBezier2);
+        std::cout << "f(u,v) : " << dot(Cv - Cu, Cv - Cu) << std::endl;
+        
+        Cu     = evalCasteljau(bez1, u, bufferBezier1);
+        CuPrim = evalCasteljau(deriv1, u, bufferDerive1);
+        Cv     = evalCasteljau(bez2, v, bufferBezier2);
+        std::cout << "dfu(u,v) :" << -2 * dot(Cv - Cu, CvPrim) << std::endl;
+
+        Cu     = evalCasteljau(bez1, u, bufferBezier1);
+        CvPrim = evalCasteljau(deriv2, v, bufferDerive2);
+        Cv     = evalCasteljau(bez2, v, bufferBezier2);
+        std::cout << "dfv(u,v) :" << -2 * dot(Cv - Cu, CuPrim) << std::endl;
+
         // auto vec = intersectionRayBezier(
         // bez, Xinv,
         // {
@@ -109,7 +136,7 @@ int main(int, char**) {
         // std::cout << i << " proposition, time = " << vec[i].time << std::endl;
         // }
     }
-    LikeABullyAABBNewton();
+    // LikeABullyAABBNewton();
 }
 
 struct BezierPerf

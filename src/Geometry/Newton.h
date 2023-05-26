@@ -51,14 +51,17 @@ std::optional<std::vector<double>> newtonRalphson(
         const auto evalFu = dfu(u, v);
         const auto evalFv = dfv(u, v);
 
-        const double prevU = u;
-        const double prevV = v;
+        const auto JF = std::array<double, 4>{evalFu.getX(), evalFv.getX(), //
+                                              evalFu.getY(), evalFv.getY()};
 
-        u = (-evalF + evalFu * prevU)/evalFu;
-        v = (-evalF + evalFv * prevV)/evalFv;
+        const auto JFInv = inverse(JF);
 
-        if (u < 0.01 && v < 0.01)
-            return std::vector<double;
+        const auto previousUV = Coord({u,v});
+        uv.x -= JFInv[0] * evalF[0] + JFInv[1] * evalF[1];
+        uv.y -= JFInv[2] * evalF[0] + JFInv[3] * evalF[1];
+
+        if (distance(previousUV, uv) <= uvEpsilon)
+            return true;
     }
 
     return false;
