@@ -59,9 +59,8 @@ void evaluatePerf() {
     {
         auto timer = Timer{"AABB without avoid doublons: "};
         for (int i = 0; i < perf.beziers.size(); ++i) {
-            
+
             for (int j = 0; j < perf.ray.size(); ++j) {
-                
 
                 intersectionRayBezier(perf.beziers[i], perf.ray[j],
                                       {
@@ -171,11 +170,13 @@ int main(int, char**) {
 
         Segment X    = Segment({Coord({-10.0, 0.0000000001}), Coord({5.0, 0.00000000001})});
         Segment Xinv = Segment({Coord({5.0, -0.523001}), Coord({-10.0, -0.500789000001})});
+        auto    buf  = createBuffer(bez1.degree());
+        auto    p    = getNearestPointOnCurve(bez1, Coord({0, -2.0}), 5);
 
-        auto p = getNearestPointOnCurve(bez1 , Coord({-1.0, 0.0}) , 2);
-
-        std::cout << " point x:" << p.coord.x << " y : "<< p.coord.y << " at time : "<< p.time << std::endl;
-
+        std::cout << " point x:" << p.coord.x << " y : " << p.coord.y << " at time : " << p.time << std::endl
+                  << "eval castel at time : "
+                  << " point x:" << evalCasteljau(bez1, p.time, buf).x << " y : " << evalCasteljau(bez1, p.time, buf).y
+                  << std::endl;
     }
     // LikeABullyAABBNewton();
     // evaluatePerf();

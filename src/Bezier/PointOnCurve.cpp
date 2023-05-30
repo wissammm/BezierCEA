@@ -13,7 +13,7 @@ CoordTime getNearestPointOnCurve(Bezier bez, Coord p, size_t nbIter) {
 
     size_t              lutMinDist;
     std::vector<double> tmpDist(bez.nbControlPoint());
-    for (size_t n = 0; n < nbIter-1; ++n) {
+    for (size_t n = 0; n < nbIter; ++n) {
         auto lut = computeLUT(part.bez, bez.nbControlPoint());
         for (size_t i = 0; i < lut.size(); ++i) {
             tmpDist[i] = distance(lut[i].coord, p);
@@ -21,8 +21,10 @@ CoordTime getNearestPointOnCurve(Bezier bez, Coord p, size_t nbIter) {
                 lutMinDist = i;
                 minDist    = tmpDist[i];
             }
-            if(i == lut.size()-1) return CoordTime({lut[lutMinDist].coord, part.tBegin + lut[lutMinDist].time * (part.tEnd - part.tBegin) });
         }
+        if (n == nbIter - 1)
+            return CoordTime({lut[lutMinDist].coord, part.tBegin + lut[lutMinDist].time * (part.tEnd - part.tBegin)});
+
         if (lutMinDist == 0) {
             part = BezierWithInitialTime(        //
                 {decompose(bez, lut[1].time)[0], //
@@ -30,8 +32,8 @@ CoordTime getNearestPointOnCurve(Bezier bez, Coord p, size_t nbIter) {
                  part.tBegin + lut[1].time * (part.tEnd - part.tBegin)});
         } else if (lutMinDist == bez.nbControlPoint() - 1) {
             part = BezierWithInitialTime(                                                      //
-                {decompose(bez, lut[bez.nbControlPoint() - 2].time)[1],                        //
-                 part.tBegin + lut[bez.nbControlPoint() - 2].time * (part.tEnd - part.tBegin), //
+                {decompose(bez, lut[bez.nbControlPoint() - 1].time)[1],                        //
+                 part.tBegin + lut[bez.nbControlPoint() - 1].time * (part.tEnd - part.tBegin), //
                  part.tEnd});
         } else {
             if (tmpDist[lutMinDist - 1] < tmpDist[lutMinDist + 1]) {
@@ -57,6 +59,6 @@ CoordTime getNearestPointOnCurve(Bezier bez, Coord p, size_t nbIter) {
             }
         }
     }
-    
-    return CoordTime() ;
+
+    return CoordTime();
 }
