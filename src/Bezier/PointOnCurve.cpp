@@ -13,7 +13,7 @@ CoordTime getNearestPointOnCurve(Bezier bez, Coord p, size_t nbIter) {
 
     size_t              lutMinDist;
     std::vector<double> tmpDist(bez.nbControlPoint());
-    for (size_t n = 0; n < nbIter; ++n) {
+    for (size_t n = 0; n < nbIter-1; ++n) {
         auto lut = computeLUT(part.bez, bez.nbControlPoint());
         for (size_t i = 0; i < lut.size(); ++i) {
             tmpDist[i] = distance(lut[i].coord, p);
@@ -21,6 +21,7 @@ CoordTime getNearestPointOnCurve(Bezier bez, Coord p, size_t nbIter) {
                 lutMinDist = i;
                 minDist    = tmpDist[i];
             }
+            if(i == lut.size()-1) return CoordTime({lut[lutMinDist].coord, part.tBegin + lut[lutMinDist].time * (part.tEnd - part.tBegin) });
         }
         if (lutMinDist == 0) {
             part = BezierWithInitialTime(        //
@@ -56,5 +57,6 @@ CoordTime getNearestPointOnCurve(Bezier bez, Coord p, size_t nbIter) {
             }
         }
     }
-    return CoordTime();
+    
+    return CoordTime() ;
 }
