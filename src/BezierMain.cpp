@@ -168,14 +168,15 @@ int main(int, char**) {
             Coord({2.0, 0.0}),
         }));
 
-        Segment X    = Segment({Coord({-10.0, 0.0000000001}), Coord({5.0, 0.00000000001})});
-        Segment Xinv = Segment({Coord({5.0, -0.523001}), Coord({-10.0, -0.500789000001})});
-        auto    buf  = createBuffer(bez1.degree());
-        auto    p    = getNearestPointOnCurve(bez1, Coord({0, -2.0}), 5);
+        Segment X        = Segment({Coord({-10.0, 0.0000000001}), Coord({5.0, 0.00000000001})});
+        Segment Xinv     = Segment({Coord({5.0, -0.523001}), Coord({-10.0, -0.500789000001})});
+        auto    buf      = createBuffer(bez1.degree());
+        auto    pOnCurve = evalCasteljau(bez1, 1.0, buf);
+        auto    p        = getNearestPointOnCurve(bez1, pOnCurve, 8);
 
         std::cout << " point x:" << p.coord.x << " y : " << p.coord.y << " at time : " << p.time << std::endl
                   << "eval castel at time : "
-                  << " point x:" << evalCasteljau(bez1, p.time, buf).x << " y : " << evalCasteljau(bez1, p.time, buf).y
+                  << " point x:" << pOnCurve.x << " y : " << pOnCurve.y
                   << std::endl;
     }
     // LikeABullyAABBNewton();
