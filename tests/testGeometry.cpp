@@ -4,6 +4,7 @@
 #include <iostream>
 #include "Bezier/Bezier.h"
 #include "Geometry/Coord.h"
+#include "Geometry/Doublons.h"
 #include "Geometry/Newton.h"
 #include "Geometry/Segment.h"
 #include "Bezier/BezierRayIntersection.h"
@@ -26,7 +27,6 @@ TEST(Angle, flatAngle) {
 
     flat = isControlPointsFlat(points, 0.0001);
     EXPECT_TRUE(flat);
-
 }
 
 TEST(Angle, flatAngleSpecialCase1) {
@@ -34,5 +34,11 @@ TEST(Angle, flatAngleSpecialCase1) {
 
     auto flat = isControlPointsFlat(points, 0.00000000000000001);
     EXPECT_FALSE(flat);
+}
 
+TEST(Doublons, doublonsSimple) {
+    const auto          f = [&](double a, double b) { return std::abs(a - b) < 1; };
+    std::vector<double> d{50, 50, 65, 48, 56, 78, 15, 50, 48};
+    auto                sansDoublons = doublons(d, f);
+    ASSERT_EQ(sansDoublons.size(),d.size()-3);
 }

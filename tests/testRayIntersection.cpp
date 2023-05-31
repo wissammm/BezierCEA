@@ -113,7 +113,7 @@ TEST(RayIntersectionNaiveNewton, LikeABullyNaiveNewton) {
     for (uint_fast16_t i = 3; i < 5; i++) {
         auto   controlPoint = randomPoints(i, 256, 256);
         Bezier curve        = Bezier(controlPoint);
-        for (uint_fast16_t j = 0; j < 128; ++j) {
+        for (uint_fast16_t j = 0; j < 512; ++j) {
             auto point = randomPoint(256, 256);
 
             double  t             = distribution(generator);
@@ -146,10 +146,10 @@ TEST(RayIntersectionNaiveNewton, LikeABullyAABBNewton) {
     int                              cptNotFound = 0;
     int                              cpt         = 0;
 
-    for (uint_fast16_t i = 3; i < 5; i++) {
+    for (uint_fast16_t i = 3; i < 6; i++) {
         auto   controlPoint = randomPoints(i, 256, 256);
         Bezier curve        = Bezier(controlPoint);
-        for (uint_fast16_t j = 0; j < 128; ++j) {
+        for (uint_fast16_t j = 0; j < 512; ++j) {
             auto point = randomPoint(256, 256);
 
             double  t                  = distribution(generator);

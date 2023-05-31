@@ -5,6 +5,7 @@
 #include "Bezier/BezierDerivate.h"
 #include "Bezier/BoundingBox.h"
 #include "Bezier/PointOnCurve.h"
+#include "Geometry/Doublons.h"
 #include "IO/Dump.h"
 #include <optional>
 #include <cmath>
@@ -27,6 +28,10 @@ class Timer
         const auto duration = std::chrono::duration<double, std::milli>(tEnd - tStart).count();
         std::cout << message << duration << std::endl;
     }
+    double getTime() {
+        const auto tEnd = std::chrono::high_resolution_clock::now();
+        return std::chrono::duration<double, std::milli>(tEnd - tStart).count();
+    };
 
   private:
     std::string                                    message;
@@ -41,12 +46,12 @@ struct BezierPerf
 
 BezierPerf createPerfModel() {
     BezierPerf perf;
-    for (size_t i = 0; i < 500; ++i) {
+    for (size_t i = 0; i < 6; ++i) {
         auto   controlPoint = randomPoints(5, 256, 256);
         Bezier curve        = Bezier(controlPoint);
         perf.beziers.push_back(curve);
     }
-    for (size_t i = 0; i < 100; ++i) {
+    for (size_t i = 0; i < 200; ++i) {
         auto point1 = randomPoint(256, 256);
         auto point2 = randomPoint(256, 256);
         perf.ray.push_back(Segment({point1, point2}));
@@ -55,93 +60,109 @@ BezierPerf createPerfModel() {
 }
 
 void evaluatePerf() {
-    auto perf = createPerfModel();
+    auto   perf = createPerfModel();
+    size_t nbInter= 0;
     {
         auto timer = Timer{"AABB without avoid doublons: "};
         for (int i = 0; i < perf.beziers.size(); ++i) {
 
             for (int j = 0; j < perf.ray.size(); ++j) {
-
-                intersectionRayBezier(perf.beziers[i], perf.ray[j],
-                                      {
-                                          .mode                  = BOUNDING_BOX,
-                                          .evaluateCoordOnBezier = true,
-                                          .isSegment             = false,
-                                          .avoidDoublons         = false,
-                                          .newtonOptions         = {.epsilon = 0.001},
-                                          .aabbOptions           = {.epsilon = 0.001, .maxDepth = 10}
-                });
+                nbInter += intersectionRayBezier(perf.beziers[i], perf.ray[j],
+                                                 {
+                                                     .mode                  = BOUNDING_BOX,
+                                                     .evaluateCoordOnBezier = true,
+                                                     .isSegment             = false,
+                                                     .avoidDoublons         = false,
+                                                     .newtonOptions         = {.epsilon = 0.001},
+                                                     .aabbOptions           = {.epsilon = 0.001, .maxDepth = 10}
+                })
+                               .size();
             }
         }
+        std::cout << "Nombre d'intersection: " << nbInter << std::endl;
     }
+    nbInter= 0;
+
     {
         auto timer = Timer{"AABB with simple BoundingBox: "};
         for (int i = 0; i < perf.beziers.size(); ++i) {
             for (int j = 0; j < perf.ray.size(); ++j) {
-                intersectionRayBezier(
-                    perf.beziers[i], perf.ray[j],
-                    {
-                        .mode                  = BOUNDING_BOX,
-                        .evaluateCoordOnBezier = true,
-                        .isSegment             = false,
-                        .avoidDoublons         = false,
-                        .newtonOptions         = {.epsilon = 0.001},
-                        .aabbOptions           = {.useSimpleBoundingBox = false, .epsilon = 0.001, .maxDepth = 10}
-                });
+                nbInter += intersectionRayBezier(
+                               perf.beziers[i], perf.ray[j],
+                               {
+                                   .mode                  = BOUNDING_BOX,
+                                   .evaluateCoordOnBezier = true,
+                                   .isSegment             = false,
+                                   .avoidDoublons         = false,
+                                   .newtonOptions         = {.epsilon = 0.001},
+                                   .aabbOptions = {.useSimpleBoundingBox = false, .epsilon = 0.001, .maxDepth = 10}
+                })
+                               .size();
             }
         }
+        std::cout << "Nombre d'intersection : " << nbInter << std::endl;
     }
+    nbInter= 0;
     {
         auto timer = Timer{"AABB with avoid doublons: "};
         for (int i = 0; i < perf.beziers.size(); ++i) {
             for (int j = 0; j < perf.ray.size(); ++j) {
-                intersectionRayBezier(
-                    perf.beziers[i], perf.ray[j],
-                    {
-                        .mode                  = BOUNDING_BOX,
-                        .evaluateCoordOnBezier = true,
-                        .isSegment             = false,
-                        .avoidDoublons         = true,
-                        .epsilonDoublons       = 0.001,
-                        .newtonOptions         = {.epsilon = 0.001},
-                        .aabbOptions           = {.useSimpleBoundingBox = false, .epsilon = 0.001, .maxDepth = 10}
-                });
+                nbInter += intersectionRayBezier(
+                               perf.beziers[i], perf.ray[j],
+                               {
+                                   .mode                  = BOUNDING_BOX,
+                                   .evaluateCoordOnBezier = true,
+                                   .isSegment             = false,
+                                   .avoidDoublons         = true,
+                                   .epsilonDoublons       = 0.001,
+                                   .newtonOptions         = {.epsilon = 0.001},
+                                   .aabbOptions = { .epsilon = 0.001, .maxDepth = 10}
+                })
+                               .size();
             }
         }
+        std::cout << "Nombre d'intersection: " << nbInter << std::endl;
     }
-
+    nbInter= 0;
     {
         auto timer = Timer{"NAIVE with avoid doublons: "};
         for (int i = 0; i < perf.beziers.size(); ++i) {
             for (int j = 0; j < perf.ray.size(); ++j) {
-                intersectionRayBezier(perf.beziers[i], perf.ray[j],
-                                      {
-                                          .mode                  = NAIVE,
-                                          .evaluateCoordOnBezier = true,
-                                          .isSegment             = false,
-                                          .avoidDoublons         = true,
-                                          .epsilonDoublons       = 0.001,
-                                          .newtonOptions         = {.epsilon = 0.001},
-                                          .naiveOptions = {.useSimpleBoundingBox = false, .nbPointsOnCurve = 1000}
-                });
+                nbInter +=
+                    intersectionRayBezier(perf.beziers[i], perf.ray[j],
+                                          {
+                                              .mode                  = NAIVE,
+                                              .evaluateCoordOnBezier = true,
+                                              .isSegment             = false,
+                                              .avoidDoublons         = true,
+                                              .epsilonDoublons       = 0.001,
+                                              .newtonOptions         = {.epsilon = 0.001},
+                                              .naiveOptions = {.useSimpleBoundingBox = false, .nbPointsOnCurve = 1000}
+                })
+                        .size();
             }
         }
+        std::cout << "Nombre d'intersection: " << nbInter << std::endl;
     }
+    nbInter= 0;
     {
         auto timer = Timer{"NAIVE without avoid doublons: "};
         for (int i = 0; i < perf.beziers.size(); ++i) {
             for (int j = 0; j < perf.ray.size(); ++j) {
-                intersectionRayBezier(perf.beziers[i], perf.ray[j],
-                                      {
-                                          .mode                  = NAIVE,
-                                          .evaluateCoordOnBezier = true,
-                                          .isSegment             = false,
-                                          .avoidDoublons         = false,
-                                          .newtonOptions         = {.epsilon = 0.001},
-                                          .naiveOptions = {.useSimpleBoundingBox = false, .nbPointsOnCurve = 1000}
-                });
+                nbInter +=
+                    intersectionRayBezier(perf.beziers[i], perf.ray[j],
+                                          {
+                                              .mode                  = NAIVE,
+                                              .evaluateCoordOnBezier = true,
+                                              .isSegment             = false,
+                                              .avoidDoublons         = false,
+                                              .newtonOptions         = {.epsilon = 0.001},
+                                              .naiveOptions = {.useSimpleBoundingBox = false, .nbPointsOnCurve = 1000}
+                })
+                        .size();
             }
         }
+        std::cout << "Nombre d'intersection: " << nbInter << std::endl;
     }
 }
 
@@ -153,32 +174,34 @@ int main(int, char**) {
     Bezier curve_bez;
     int    nb_points_on_curve = 60;
 
-    {
-        auto   timer = Timer{"test timer: "};
-        Bezier bez1  = Bezier(std::vector<Coord>({
-            Coord({0.0, 1.0}),
-            Coord({-1.0, 0.0}),
-            Coord({-1.0, -1.0}),
-            Coord({0.0, -2.0}),
-        }));
-        Bezier bez2  = Bezier(std::vector<Coord>({
-            Coord({-1.0, 0.0}),
-            Coord({0.0, 0.70}),
-            Coord({1.0, -1.0}),
-            Coord({2.0, 0.0}),
-        }));
+  
 
-        Segment X        = Segment({Coord({-10.0, 0.0000000001}), Coord({5.0, 0.00000000001})});
-        Segment Xinv     = Segment({Coord({5.0, -0.523001}), Coord({-10.0, -0.500789000001})});
-        auto    buf      = createBuffer(bez1.degree());
-        auto    pOnCurve = evalCasteljau(bez1, 1.0, buf);
-        auto    p        = getNearestPointOnCurve(bez1, pOnCurve, 8);
+    // {
+    //     auto   timer = Timer{"test timer: "};
+    //     Bezier bez1  = Bezier(std::vector<Coord>({
+    //         Coord({0.0, 1.0}),
+    //         Coord({-1.0, 0.0}),
+    //         Coord({-1.0, -1.0}),
+    //         Coord({0.0, -2.0}),
+    //     }));
+    //     Bezier bez2  = Bezier(std::vector<Coord>({
+    //         Coord({-1.0, 0.0}),
+    //         Coord({0.0, 0.70}),
+    //         Coord({1.0, -1.0}),
+    //         Coord({2.0, 0.0}),
+    //     }));
 
-        std::cout << " point x:" << p.coord.x << " y : " << p.coord.y << " at time : " << p.time << std::endl
-                  << "eval castel at time : "
-                  << " point x:" << pOnCurve.x << " y : " << pOnCurve.y
-                  << std::endl;
-    }
+    //     Segment X        = Segment({Coord({-10.0, 0.0000000001}), Coord({5.0, 0.00000000001})});
+    //     Segment Xinv     = Segment({Coord({5.0, -0.523001}), Coord({-10.0, -0.500789000001})});
+    //     auto    buf      = createBuffer(bez1.degree());
+    //     auto    pOnCurve = evalCasteljau(bez1, 1.0, buf);
+    //     auto    p        = getNearestPointOnCurve(bez1, pOnCurve, 8);
+
+    //     std::cout << " point x:" << p.coord.x << " y : " << p.coord.y << " at time : " << p.time << std::endl
+    //               << "eval castel at time : "
+    //               << " point x:" << pOnCurve.x << " y : " << pOnCurve.y
+    //               << std::endl;
+    // }
     // LikeABullyAABBNewton();
-    // evaluatePerf();
+    evaluatePerf();
 }
