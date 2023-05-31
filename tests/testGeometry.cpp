@@ -40,5 +40,6 @@ TEST(Doublons, doublonsSimple) {
     const auto          f = [&](double a, double b) { return std::abs(a - b) < 1; };
     std::vector<double> d{50, 50, 65, 48, 56, 78, 15, 50, 48};
     auto                sansDoublons = doublons(d, f);
-    ASSERT_EQ(sansDoublons.size(),d.size()-3);
+    EXPECT_EQ(sansDoublons.size(),d.size()-3);
 }
+

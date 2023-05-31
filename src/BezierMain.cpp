@@ -178,24 +178,24 @@ int main(int, char**) {
 
     // {
     //     auto   timer = Timer{"test timer: "};
-    //     Bezier bez1  = Bezier(std::vector<Coord>({
-    //         Coord({0.0, 1.0}),
-    //         Coord({-1.0, 0.0}),
-    //         Coord({-1.0, -1.0}),
-    //         Coord({0.0, -2.0}),
-    //     }));
-    //     Bezier bez2  = Bezier(std::vector<Coord>({
-    //         Coord({-1.0, 0.0}),
-    //         Coord({0.0, 0.70}),
-    //         Coord({1.0, -1.0}),
-    //         Coord({2.0, 0.0}),
-    //     }));
+        // Bezier bez1  = Bezier(std::vector<Coord>({
+        //     Coord({0.0, 1.0}),
+        //     Coord({-1.0, 0.0}),
+        //     Coord({-1.0, -1.0}),
+        //     Coord({0.0, -2.0}),
+        // }));
+        // Bezier bez2  = Bezier(std::vector<Coord>({
+        //     Coord({-1.0, 0.0}),
+        //     Coord({0.0, 0.70}),
+        //     Coord({1.0, -1.0}),
+        //     Coord({2.0, 0.0}),
+        // }));
 
-    //     Segment X        = Segment({Coord({-10.0, 0.0000000001}), Coord({5.0, 0.00000000001})});
-    //     Segment Xinv     = Segment({Coord({5.0, -0.523001}), Coord({-10.0, -0.500789000001})});
-    //     auto    buf      = createBuffer(bez1.degree());
-    //     auto    pOnCurve = evalCasteljau(bez1, 1.0, buf);
-    //     auto    p        = getNearestPointOnCurve(bez1, pOnCurve, 8);
+        // Segment X        = Segment({Coord({-10.0, 0.0000000001}), Coord({5.0, 0.00000000001})});
+        // Segment Xinv     = Segment({Coord({5.0, -0.523001}), Coord({-10.0, -0.500789000001})});
+        // auto    buf      = createBuffer(bez1.degree());
+        // auto    pOnCurve = evalCasteljau(bez1, 1.0, buf);
+        // auto    p        = getNearestPointOnCurve(bez1, pOnCurve, 8);
 
     //     std::cout << " point x:" << p.coord.x << " y : " << p.coord.y << " at time : " << p.time << std::endl
     //               << "eval castel at time : "

@@ -47,7 +47,7 @@ CoordTime getNearestPointOnCurve(Bezier bez, Coord p, size_t nbIter) {
                 part             = BezierWithInitialTime(                                            //
                     {decompose(bez, lut[lutMinDist].time * (1 - tmpTbegin))[0],          //
                                  part.tBegin,                                                        //
-                                 part.tBegin + (lut[lutMinDist].time * (1 - tmpTbegin)) * (part.tEnd - part.tBegin)});
+                                part.tBegin + (lut[lutMinDist].time - part.tBegin) * (part.tEnd - part.tBegin)});
             } else {
                 double tmpTbegin = part.tBegin;
                 part             = BezierWithInitialTime(                                        //
