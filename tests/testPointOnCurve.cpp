@@ -25,7 +25,7 @@ TEST(PointOnCurve, simplePointOnCurve) {
 
         auto    buf      = createBuffer(bez1.degree());
         auto    pOnCurve = Coord({-1.0, -1.0});
-        auto    p        = getNearestPointOnCurve(bez1, pOnCurve, 8);
+        auto    p        = getNearestPointOnCurve(bez1, pOnCurve, 4);
         
         EXPECT_NEAR(distance(p.coord,pOnCurve), 0, 0.1);
 

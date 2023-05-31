@@ -31,13 +31,16 @@ CoordTime getNearestPointOnCurve(Bezier bez, Coord p, size_t nbIter) {
                  part.tBegin,                    //
                  part.tBegin + lut[1].time * (part.tEnd - part.tBegin)});
 
-        } else if (lutMinDist == bez.nbControlPoint() - 1) {
-            part = BezierWithInitialTime(                                                      //
-                {decompose(bez, lut[bez.nbControlPoint() - 1].time)[1],                        //
-                 part.tBegin + lut[bez.nbControlPoint() - 1].time * (part.tEnd - part.tBegin), //
-                 part.tEnd});
+        }
+        //TODO
+        //else if (lutMinDist == bez.nbControlPoint() - 1) {
+        //     part = BezierWithInitialTime(                                                      //
+        //         {decompose(bez, lut[bez.nbControlPoint() - 1].time)[1],                        //
+        //          part.tBegin + lut[bez.nbControlPoint() - 1].time * (part.tEnd - part.tBegin), //
+        //          part.tEnd});
 
-        } else {
+        // } 
+        else {
             if (tmpDist[lutMinDist - 1] < tmpDist[lutMinDist + 1]) {
                 double tmpTbegin = part.tBegin;
                 part             = BezierWithInitialTime(                                            //
