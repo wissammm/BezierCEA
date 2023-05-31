@@ -76,7 +76,10 @@ std::vector<double> curveCurveBoundingBoxMethod(Bezier bez1, Bezier bez2, size_t
 
             if (isAABBintersectAABB(aabbBez1, aabbBez2)) {
                 //TODO change condition
-                if (0 < EPSILON_ANGLE) {
+                if (distance(aabbBez1.base, Coord({aabbBez1.base.x + aabbBez1.w, aabbBez1.base.y + aabbBez1.h})) <
+                        EPSILON_ANGLE &&
+                    distance(aabbBez2.base, Coord({aabbBez2.base.x + aabbBez2.w, aabbBez2.base.y + aabbBez2.h})) <
+                        EPSILON_ANGLE) {
                     timesFoundInterpolate.push_back(actualBez1.tBegin + (actualBez1.tEnd - actualBez1.tBegin) / 2.0);
                 } else {
                     auto   decomposeBez = decompose(actualBez1.bez, 0.5);

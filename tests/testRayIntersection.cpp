@@ -105,53 +105,40 @@ TEST(RayIntersectionNaiveNewton, BadFirstGuessNewton) {
     }
 }
 
-// TEST(RayIntersectionNaiveNewton, LikeABullyNaiveNewton) {
-//     std::mt19937                     generator;
-//     std::uniform_real_distribution<> distribution(0, 1);
-//     int                              cptNotFound = 0;
-//     int                              cpt         = 0;
+TEST(RayIntersectionNaiveNewton, LikeABullyNaiveNewton) {
+    std::mt19937                     generator;
+    std::uniform_real_distribution<> distribution(0, 1);
+    int                              cptNotFound = 0;
 
-//     for (uint_fast16_t i = 3; i < 5; i++) {
-//         auto   controlPoint = randomPoints(i, 256, 256);
-//         Bezier curve        = Bezier(controlPoint);
-//         for (uint_fast16_t j = 0; j < 128; ++j) {
-//             auto point = randomPoint(256, 256);
+    for (uint_fast16_t i = 3; i < 5; i++) {
+        auto   controlPoint = randomPoints(i, 256, 256);
+        Bezier curve        = Bezier(controlPoint);
+        for (uint_fast16_t j = 0; j < 128; ++j) {
+            auto point = randomPoint(256, 256);
 
-//             double  t             = distribution(generator);
-//             Buffer  buffer        = createBuffer(curve.nbControlPoint());
-//             Coord   on_curve      = evalCasteljau(curve, t, buffer);
-//             Segment seg           = Segment({on_curve, point});
-//             auto    intersections = intersectionRayBezier(
-//                 curve, seg,
-//                 {.mode = NAIVE, .evaluateCoordOnBezier = true, .naiveOptions = {.nbPointsOnCurve = 100000}});
-//             bool one_good_intersect = false;
-//             for (size_t k = 0; k < intersections.size(); ++k) {
-//                 double diff = t - intersections[k].time;
-//                 if (std::abs(diff) <= 0.001) {
-//                     one_good_intersect = true;
-//                 } else {
-//                     // std::cout << "not a intersect " << std::endl;
-//                 }
-//             }
-//             if (!one_good_intersect) {
-//                 cptNotFound++;
-//                 // std::cout << "no intersects, nb of intersection =  " << intersections.size() << std::endl;
-//                 // std::cout << " Point \n x: " << point.x << " y :" << point.y << std::endl;
-//                 // std::cout << " Point On Curve  \n x: " << on_curve.x << " y :" << on_curve.y << std::endl;
-
-//                 // for (size_t k = 0; k < intersections.size(); ++k) {
-
-//                 //     std::cout << "t expected = " << t << " ,t we have" << intersections[k].time << std::endl;
-//                 // }
-//             }
-//             // ASSERT_TRUE(one_good_intersect);
-//             cpt++;
-//         }
-//     }
-//     std::cout << "NAIVE : nb intersections not found =  " << cptNotFound << " on " << cpt << " intersections"
-//               << std::endl;
-//     ASSERT_TRUE(true);
-// }
+            double  t             = distribution(generator);
+            Buffer  buffer        = createBuffer(curve.nbControlPoint());
+            Coord   on_curve      = evalCasteljau(curve, t, buffer);
+            Segment seg           = Segment({on_curve, point});
+            auto    intersections = intersectionRayBezier(
+                curve, seg,
+                {.mode = NAIVE, .evaluateCoordOnBezier = true, .naiveOptions = {.nbPointsOnCurve = 100000}});
+            bool one_good_intersect = false;
+            for (size_t k = 0; k < intersections.size(); ++k) {
+                double diff = t - intersections[k].time;
+                if (std::abs(diff) <= 0.001) {
+                    one_good_intersect = true;
+                }
+            }
+            if (!one_good_intersect) {
+                cptNotFound++;
+            }
+        }
+    }
+    std::cout << "NAIVE : nb intersections not found =  " << cptNotFound << " on " << 256 << " intersections"
+              << std::endl;
+    ASSERT_EQ(cptNotFound, 0);
+}
 
 TEST(RayIntersectionNaiveNewton, LikeABullyAABBNewton) {
     std::mt19937                     generator;
@@ -182,33 +169,21 @@ TEST(RayIntersectionNaiveNewton, LikeABullyAABBNewton) {
                 double diff = t - intersections[k].time;
                 if (std::abs(diff) <= 0.01) {
                     one_good_intersect = true;
-                } else {
-                    // std::cout << "not a intersect " << std::endl;
                 }
             }
             if (!one_good_intersect) {
                 cptNotFound++;
-                // std::cout << "no intersects, nb of intersection =  " << intersections.size() << std::endl;
-                // std::cout << " Point \n x: " << point.x << " y :" << point.y << std::endl;
-                // std::cout << " Point On Curve  \n x: " << on_curve.x << " y :" << on_curve.y << std::endl;
-
-                // for (size_t k = 0; k < intersections.size(); ++k) {
-
-                //     std::cout << "t expected = " << t << " ,t we have" << intersections[k].time << std::endl;
-                // }
             }
             cpt++;
-            //ASSERT_TRUE(one_good_intersect);
         }
     }
-    std::cout << "AABB : nb intersections not found =  " << cptNotFound << " on " << cpt << " intersections"
+    std::cout << "AABB : nb intersections not found =  " << cptNotFound << " on " << 256 << " intersections"
               << std::endl;
-    ASSERT_TRUE(true);
+    ASSERT_EQ(cptNotFound, 0);
 }
 
 TEST(RayIntersectionNaiveNewton, SpecialCase1) {
-    auto curve = Bezier(std::vector<Coord>({Coord({103, 198}), Coord({105, 115}),
-                                            Coord({81, 255})}));
+    auto curve = Bezier(std::vector<Coord>({Coord({103, 198}), Coord({105, 115}), Coord({81, 255})}));
     auto point = Coord({74, 236});
 
     double  t                  = 0.135477004296;
@@ -221,16 +196,14 @@ TEST(RayIntersectionNaiveNewton, SpecialCase1) {
                                                            .evaluateCoordOnBezier = true,
                                                            .isSegment             = false,
                                                            .newtonOptions         = {.epsilon = 0.001},
-                                                           .aabbOptions           = {.epsilon = 0.000000001, .maxDepth = 10}
+                                                           .aabbOptions = {.epsilon = 0.000000001, .maxDepth = 10}
     });
     bool    one_good_intersect = false;
     for (size_t k = 0; k < intersections.size(); ++k) {
         double diff = t - intersections[k].time;
         if (std::abs(diff) <= 0.01) {
             one_good_intersect = true;
-        } else {
-            // std::cout << "not a intersect " << std::endl;
-        }
+        } 
     }
 
     ASSERT_TRUE(one_good_intersect);
